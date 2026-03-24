@@ -1,0 +1,106 @@
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { resourceRegistry } from "../../features/resources/resourceRegistry.js";
+import { useAuth } from "../auth/AuthProvider.jsx";
+
+function groupBySection(resources) {
+    return resources.reduce((sections, resource) => {
+        const currentSection = sections[resource.section] ?? [];
+        currentSection.push(resource);
+        return {
+            ...sections,
+            [resource.section]: currentSection,
+        };
+    }, {});
+}
+
+const sections = groupBySection(resourceRegistry);
+
+export function AppShell() {
+    const navigate = useNavigate();
+    const { logout } = useAuth();
+
+    function handleLogout() {
+        logout();
+        navigate("/", { replace: true });
+    }
+
+    return (
+        <div className="min-h-screen bg-transparent text-[color:var(--app-ink)]">
+            <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-4 lg:flex-row lg:px-6">
+                <aside className="mb-4 shrink-0 rounded-[1.5rem] border border-white/50 bg-[color:var(--app-panel)] px-5 py-6 text-slate-50 shadow-[0_24px_80px_rgba(15,39,64,0.22)] lg:mb-0 lg:w-80">
+                    <NavLink
+                        to="/overview"
+                        className="block rounded-[1.25rem] border border-white/10 bg-white/5 px-4 py-4 transition hover:bg-white/10"
+                    >
+                        <div className="inline-flex items-center rounded-full bg-white/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-[color:var(--app-accent)]">
+                            ASD Management
+                        </div>
+                        <h1 className="mt-4 text-[2rem] font-semibold leading-tight text-white">
+                            Gestionale sportivo collegato a Django/DRF
+                        </h1>
+                        <p className="mt-3 text-sm leading-6 text-slate-300">
+                            Accesso protetto con moduli CRUD raccolti nella navigazione laterale.
+                        </p>
+                    </NavLink>
+
+                    <nav className="mt-8 space-y-6">
+                        <div>
+                            <p className="mb-2 text-xs uppercase tracking-[0.3em] text-slate-400">
+                                Overview
+                            </p>
+                            <NavLink
+                                to="/overview"
+                                className={({ isActive }) =>
+                                    `block rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                                        isActive
+                                            ? "bg-[color:var(--app-primary)] text-white shadow-[0_10px_24px_rgba(28,165,107,0.28)]"
+                                            : "text-slate-200 hover:bg-white/8"
+                                    }`
+                                }
+                            >
+                                Dashboard
+                            </NavLink>
+                        </div>
+
+                        {Object.entries(sections).map(([sectionName, resources]) => (
+                            <div key={sectionName}>
+                                <p className="mb-2 text-xs uppercase tracking-[0.3em] text-slate-400">
+                                    {sectionName}
+                                </p>
+                                <div className="space-y-1">
+                                    {resources.map((resource) => (
+                                        <NavLink
+                                            key={resource.key}
+                                            to={`/${resource.path}`}
+                                            className={({ isActive }) =>
+                                                `block rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                                                    isActive
+                                                        ? "bg-white text-[color:var(--app-panel)]"
+                                                        : "text-slate-200 hover:bg-white/8"
+                                                }`
+                                            }
+                                        >
+                                            {resource.labels.plural}
+                                        </NavLink>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </nav>
+
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="mt-8 inline-flex w-full items-center justify-center rounded-xl border border-white/15 bg-white/8 px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white/14"
+                    >
+                        Logout
+                    </button>
+                </aside>
+
+                <main className="min-w-0 flex-1 lg:pl-6">
+                    <Outlet />
+                </main>
+            </div>
+        </div>
+    );
+}
