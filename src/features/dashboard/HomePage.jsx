@@ -40,7 +40,7 @@ function LoginPage() {
             <div className="grid w-full gap-6 lg:grid-cols-[0.95fr_1.05fr]">
                 <div className="rounded-[1.75rem] border border-[color:var(--app-border)] bg-[color:var(--app-surface-strong)] p-8 shadow-[0_24px_80px_rgba(20,36,60,0.10)]">
                     <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[color:var(--app-primary)]">
-                        ASD Management
+                        {appEnv.applicationName}
                     </p>
                     <h1 className="mt-4 text-4xl font-semibold text-[color:var(--app-ink)]">
                         Accesso Piattaforma
