@@ -51,6 +51,17 @@ export function EntityForm({
                                         </option>
                                     ))}
                                 </select>
+                            ) : field.type === "textarea" ? (
+                                <textarea
+                                    name={field.name}
+                                    value={inputValue}
+                                    onChange={onChange}
+                                    required={field.required}
+                                    maxLength={field.maxLength}
+                                    placeholder={field.placeholder}
+                                    rows={5}
+                                    className="w-full rounded-xl border border-[color:var(--app-border)] bg-slate-50 px-4 py-3 text-[color:var(--app-ink)] outline-none transition focus:border-[color:var(--app-primary)] focus:bg-white"
+                                />
                             ) : (
                                 <input
                                     type={field.type}
