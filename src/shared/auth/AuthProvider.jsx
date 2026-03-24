@@ -7,7 +7,7 @@ import {
     setStoredTokens,
     setStoredUsername,
 } from "../api/client.js";
-import { appEnv } from "../config/env.js";
+import { appEnv, getAuthLoginPath } from "../config/env.js";
 
 const AuthContext = createContext(null);
 
@@ -52,7 +52,7 @@ export function AuthProvider({ children }) {
                     return mockSession;
                 }
 
-                const response = await apiClient.post(appEnv.authLoginPath, {
+                const response = await apiClient.post(getAuthLoginPath(), {
                     username,
                     password,
                 });
