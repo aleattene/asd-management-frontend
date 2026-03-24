@@ -1,5 +1,5 @@
 import axios from "axios";
-import { appEnv } from "../config/env.js";
+import { getApiBaseUrl } from "../config/env.js";
 
 export const AUTH_STORAGE_KEYS = {
     accessToken: "asd-management.auth.access-token",
@@ -62,13 +62,14 @@ export function setStoredUsername(username = "") {
 }
 
 export const apiClient = axios.create({
-    baseURL: appEnv.apiBaseUrl,
     headers: {
         "Content-Type": "application/json",
     },
 });
 
 apiClient.interceptors.request.use((config) => {
+    config.baseURL = config.baseURL ?? getApiBaseUrl();
+
     const accessToken = getStoredAccessToken();
 
     if (accessToken) {

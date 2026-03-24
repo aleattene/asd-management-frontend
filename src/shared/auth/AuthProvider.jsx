@@ -1,11 +1,13 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import {
+    apiClient,
     getStoredAccessToken,
     getStoredRefreshToken,
     getStoredUsername,
     setStoredTokens,
     setStoredUsername,
 } from "../api/client.js";
+import { appEnv } from "../config/env.js";
 
 const AuthContext = createContext(null);
 
@@ -32,26 +34,44 @@ export function AuthProvider({ children }) {
         () => ({
             isAuthenticated: Boolean(authState.accessToken),
             username: authState.username,
-            // Placeholder for the future JWT login call to Django/DRF.
             async login(credentials) {
-                if (!import.meta.env.DEV) {
-                    throw new Error(
-                        "JWT login backend not configured. Set up the Django/DRF auth endpoint before enabling production login.",
-                    );
+                const username = credentials.username.trim();
+                const password = credentials.password;
+
+                if (appEnv.enableMockAuth) {
+                    const mockSession = {
+                        accessToken: "mock-jwt-access-token",
+                        refreshToken: "mock-jwt-refresh-token",
+                        username: username || "admin",
+                    };
+
+                    setStoredTokens(mockSession);
+                    setStoredUsername(mockSession.username);
+                    setAuthState(mockSession);
+
+                    return mockSession;
                 }
 
-                const username = credentials.username || "admin";
-                const mockSession = {
-                    accessToken: "mock-jwt-access-token",
-                    refreshToken: "mock-jwt-refresh-token",
+                const response = await apiClient.post(appEnv.authLoginPath, {
+                    username,
+                    password,
+                });
+
+                const session = {
+                    accessToken: response.data?.access ?? "",
+                    refreshToken: response.data?.refresh ?? "",
                     username,
                 };
 
-                setStoredTokens(mockSession);
-                setStoredUsername(username);
-                setAuthState(mockSession);
+                if (!session.accessToken) {
+                    throw new Error("JWT login response missing access token.");
+                }
 
-                return mockSession;
+                setStoredTokens(session);
+                setStoredUsername(session.username);
+                setAuthState(session);
+
+                return session;
             },
             logout() {
                 setStoredTokens({ accessToken: "", refreshToken: "" });
