@@ -8,6 +8,7 @@ function LoginPage() {
     const navigate = useNavigate();
     const { isAuthenticated, login } = useAuth();
     const [credentials, setCredentials] = useState({ username: "", password: "" });
+    const [error, setError] = useState("");
 
     if (isAuthenticated) {
         return <Navigate to="/overview" replace />;
@@ -23,8 +24,14 @@ function LoginPage() {
 
     async function handleSubmit(event) {
         event.preventDefault();
-        await login(credentials);
-        navigate("/overview");
+        setError("");
+
+        try {
+            await login(credentials);
+            navigate("/overview");
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Login non disponibile.");
+        }
     }
 
     return (
@@ -117,6 +124,10 @@ function LoginPage() {
                     >
                         Entra nel gestionale
                     </button>
+
+                    {error ? (
+                        <p className="mt-4 text-sm text-[color:var(--app-danger)]">{error}</p>
+                    ) : null}
                 </form>
             </div>
         </section>

@@ -34,6 +34,12 @@ export function AuthProvider({ children }) {
             username: authState.username,
             // Placeholder for the future JWT login call to Django/DRF.
             async login(credentials) {
+                if (!import.meta.env.DEV) {
+                    throw new Error(
+                        "JWT login backend not configured. Set up the Django/DRF auth endpoint before enabling production login.",
+                    );
+                }
+
                 const username = credentials.username || "admin";
                 const mockSession = {
                     accessToken: "mock-jwt-access-token",
