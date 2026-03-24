@@ -1,0 +1,236 @@
+import { createCrudService } from "../../shared/api/createCrudService.js";
+
+const athletesService = createCrudService("profiles/athletes");
+const categoriesService = createCrudService("profiles/athletes-categories");
+const trainersService = createCrudService("profiles/trainers");
+const sportDoctorsService = createCrudService("profiles/sport-doctors");
+const paymentsService = createCrudService("payments/payments");
+const sportCertificatesService = createCrudService(
+    "documentation/sport-certificates",
+);
+
+function toPersonOption(item) {
+    return {
+        value: item.id,
+        label: `${item.first_name} ${item.last_name}`,
+    };
+}
+
+export const resourceRegistry = [
+    {
+        key: "athletes",
+        path: "athletes",
+        section: "Anagrafiche",
+        labels: {
+            singular: "atleta",
+            plural: "Atleti",
+        },
+        description:
+            "Gestione anagrafica atleti, categoria sportiva e dati identificativi principali.",
+        service: athletesService,
+        columns: [
+            { key: "id", label: "ID" },
+            { key: "first_name", label: "Nome" },
+            { key: "last_name", label: "Cognome" },
+            { key: "date_of_birth", label: "Data di nascita", type: "date" },
+            { key: "fiscal_code", label: "Codice fiscale" },
+            { key: "category", label: "Categoria" },
+        ],
+        fields: [
+            { name: "first_name", label: "Nome", type: "text", required: true },
+            { name: "last_name", label: "Cognome", type: "text", required: true },
+            {
+                name: "date_of_birth",
+                label: "Data di nascita",
+                type: "date",
+                required: true,
+            },
+            {
+                name: "place_of_birth",
+                label: "Luogo di nascita",
+                type: "text",
+                required: true,
+            },
+            {
+                name: "fiscal_code",
+                label: "Codice fiscale",
+                type: "text",
+                required: true,
+                maxLength: 16,
+            },
+            {
+                name: "category",
+                label: "Categoria",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona categoria",
+            },
+        ],
+        optionLoaders: {
+            category: async () => {
+                const items = await categoriesService.list();
+                return items.map((item) => ({
+                    value: item.id,
+                    label: `${item.code} - ${item.description}`,
+                }));
+            },
+        },
+    },
+    {
+        key: "trainers",
+        path: "trainers",
+        section: "Anagrafiche",
+        labels: {
+            singular: "allenatore",
+            plural: "Allenatori",
+        },
+        description:
+            "Archivio allenatori con dati personali e riferimenti fiscali.",
+        service: trainersService,
+        columns: [
+            { key: "id", label: "ID" },
+            { key: "first_name", label: "Nome" },
+            { key: "last_name", label: "Cognome" },
+            { key: "fiscal_code", label: "Codice fiscale" },
+        ],
+        fields: [
+            { name: "first_name", label: "Nome", type: "text", required: true },
+            { name: "last_name", label: "Cognome", type: "text", required: true },
+            {
+                name: "fiscal_code",
+                label: "Codice fiscale",
+                type: "text",
+                required: true,
+                maxLength: 16,
+            },
+        ],
+        optionLoaders: {},
+    },
+    {
+        key: "sportDoctors",
+        path: "sport-doctors",
+        section: "Anagrafiche",
+        labels: {
+            singular: "medico sportivo",
+            plural: "Medici sportivi",
+        },
+        description:
+            "Professionisti sanitari collegati ai certificati medici sportivi.",
+        service: sportDoctorsService,
+        columns: [
+            { key: "id", label: "ID" },
+            { key: "first_name", label: "Nome" },
+            { key: "last_name", label: "Cognome" },
+            { key: "vat_number", label: "Partita IVA" },
+        ],
+        fields: [
+            { name: "first_name", label: "Nome", type: "text", required: true },
+            { name: "last_name", label: "Cognome", type: "text", required: true },
+            {
+                name: "vat_number",
+                label: "Partita IVA",
+                type: "text",
+                required: true,
+                maxLength: 11,
+            },
+        ],
+        optionLoaders: {},
+    },
+    {
+        key: "payments",
+        path: "payments",
+        section: "Amministrazione",
+        labels: {
+            singular: "compenso",
+            plural: "Compensi",
+        },
+        description:
+            "Compensi trainer con data pagamento, importo e collegamento al tecnico.",
+        service: paymentsService,
+        columns: [
+            { key: "id", label: "ID" },
+            { key: "payment_date", label: "Data pagamento", type: "date" },
+            { key: "amount", label: "Importo", type: "currency" },
+            { key: "trainer", label: "Allenatore" },
+        ],
+        fields: [
+            {
+                name: "payment_date",
+                label: "Data di pagamento",
+                type: "date",
+                required: true,
+            },
+            { name: "amount", label: "Importo", type: "number", required: true },
+            {
+                name: "trainer",
+                label: "Allenatore",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona allenatore",
+            },
+        ],
+        optionLoaders: {
+            trainer: async () => {
+                const items = await trainersService.list();
+                return items.map(toPersonOption);
+            },
+        },
+    },
+    {
+        key: "sportCertificates",
+        path: "sport-certificates",
+        section: "Documentazione",
+        labels: {
+            singular: "certificato medico",
+            plural: "Certificati medici",
+        },
+        description:
+            "Documenti sanitari con scadenza, atleta associato e medico emittente.",
+        service: sportCertificatesService,
+        columns: [
+            { key: "id", label: "ID" },
+            { key: "issue_date", label: "Emissione", type: "date" },
+            { key: "expiration_date", label: "Scadenza", type: "date" },
+            { key: "athlete", label: "Atleta" },
+            { key: "sport_doctor", label: "Medico sportivo" },
+        ],
+        fields: [
+            {
+                name: "issue_date",
+                label: "Data emissione",
+                type: "date",
+                required: true,
+            },
+            {
+                name: "expiration_date",
+                label: "Data scadenza",
+                type: "date",
+                required: true,
+            },
+            {
+                name: "sport_doctor",
+                label: "Medico sportivo",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona medico",
+            },
+            {
+                name: "athlete",
+                label: "Atleta",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona atleta",
+            },
+        ],
+        optionLoaders: {
+            sport_doctor: async () => {
+                const items = await sportDoctorsService.list();
+                return items.map(toPersonOption);
+            },
+            athlete: async () => {
+                const items = await athletesService.list();
+                return items.map(toPersonOption);
+            },
+        },
+    },
+];

@@ -1,14 +1,138 @@
+@import "tailwindcss";
+
 :root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --app-ink: #14243c;
+    --app-panel: #0f2740;
+    --app-panel-soft: #173758;
+    --app-surface: #f4f7fb;
+    --app-surface-strong: #ffffff;
+    --app-border: #d7e1eb;
+    --app-muted: #68778d;
+    --app-primary: #1ca56b;
+    --app-primary-strong: #168558;
+    --app-primary-soft: #e7f7f0;
+    --app-accent: #f1c84b;
+    --app-accent-soft: #fff3c8;
+    --app-danger-soft: #fff0ee;
+    --app-danger: #b54b43;
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
     line-height: 1.5;
     font-weight: 400;
-
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: rgb(20, 30, 37);
-
+    color: var(--app-ink);
+    background:
+        radial-gradient(circle at top left, rgba(28, 165, 107, 0.12), transparent 26%),
+        radial-gradient(circle at top right, rgba(241, 200, 75, 0.16), transparent 18%),
+        linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    background: transparent;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition:
+        background-color 150ms ease,
+        border-color 150ms ease,
+        color 150ms ease,
+        box-shadow 150ms ease,
+        opacity 150ms ease;
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-primary {
+    border-color: var(--app-primary);
+    background: var(--app-primary);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    border-color: var(--app-primary-strong);
+    background: var(--app-primary-strong);
+}
+
+.btn-secondary {
+    border-color: var(--app-panel);
+    background: var(--app-panel);
+    box-shadow: 0 6px 18px rgba(15, 39, 64, 0.12);
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    border-color: var(--app-panel-soft);
+    background: var(--app-panel-soft);
+}
+
+.btn-outline {
+    border-color: var(--app-primary);
+    background: #fff;
+    color: var(--app-primary);
+}
+
+.btn-outline:hover {
+    background: var(--app-primary-soft);
+}
+
+.btn-neutral {
+    border-color: var(--app-border);
+    background: #fff;
+    color: var(--app-ink);
+}
+
+.btn-neutral:hover {
+    background: #f8fafc;
+}
+
+.btn-danger {
+    border-color: rgba(181, 75, 67, 0.25);
+    background: #fff;
+    color: var(--app-danger);
+}
+
+.btn-danger:hover {
+    background: var(--app-danger-soft);
+}
+
+::selection {
+    background: rgba(28, 165, 107, 0.18);
 }
