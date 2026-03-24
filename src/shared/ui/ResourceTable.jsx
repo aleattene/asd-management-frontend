@@ -15,10 +15,16 @@ function formatCellValue(column, value) {
     }
 
     if (column.type === "currency") {
+        const numericValue = Number(value);
+
+        if (!Number.isFinite(numericValue)) {
+            return "—";
+        }
+
         return new Intl.NumberFormat("it-IT", {
             style: "currency",
             currency: "EUR",
-        }).format(Number(value));
+        }).format(numericValue);
     }
 
     if (typeof value === "object") {
