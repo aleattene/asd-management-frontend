@@ -94,7 +94,7 @@ export function ResourceListPage({ resource }) {
                     description={isLoading ? "..." : `${items.length}`}
                 />
                 <StatusPanel
-                    title="API target"
+                    title="Route"
                     description={resource.path}
                 />
             </div>

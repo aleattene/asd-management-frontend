@@ -45,7 +45,7 @@ function LoginPage() {
                         Accedi al gestionale
                     </h1>
                     <div className="mt-4 max-w-2xl space-y-2 text-sm leading-7 text-[color:var(--app-muted)]">
-                        <p>Accesso interno riservato agli utenti gia' presenti nel sistema. Non e' prevista registrazione pubblica.</p>
+                        <p>Accesso interno riservato agli utenti già presenti nel sistema. Non è prevista registrazione pubblica.</p>
                     </div>
 
                     <div className="mt-8 space-y-4">
