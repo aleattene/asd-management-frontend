@@ -6,10 +6,8 @@ function groupBySection(resources) {
     return resources.reduce((sections, resource) => {
         const currentSection = sections[resource.section] ?? [];
         currentSection.push(resource);
-        return {
-            ...sections,
-            [resource.section]: currentSection,
-        };
+        sections[resource.section] = currentSection;
+        return sections;
     }, {});
 }
 

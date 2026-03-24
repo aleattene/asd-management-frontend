@@ -1,5 +1,10 @@
 import { Link } from "react-router-dom";
 
+const euroCurrencyFormatter = new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: "EUR",
+});
+
 function formatCellValue(column, value) {
     if (value === null || value === undefined || value === "") {
         return "—";
@@ -21,10 +26,7 @@ function formatCellValue(column, value) {
             return "—";
         }
 
-        return new Intl.NumberFormat("it-IT", {
-            style: "currency",
-            currency: "EUR",
-        }).format(numericValue);
+        return euroCurrencyFormatter.format(numericValue);
     }
 
     if (typeof value === "object") {
