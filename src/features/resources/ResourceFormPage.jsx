@@ -121,7 +121,7 @@ export function ResourceFormPage({ resource, mode }) {
         const { name, value, type } = event.target;
         setFormValues((currentValues) => ({
             ...currentValues,
-            [name]: type === "number" ? value : value,
+            [name]: type === "number" ? (value === "" ? "" : Number(value)) : value,
         }));
     }
 
