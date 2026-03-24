@@ -27,6 +27,20 @@ function normalizeRecord(resource, record) {
     }, {});
 }
 
+function buildSubmitPayload(resource, values) {
+    return resource.fields.reduce((payload, field) => {
+        const fieldValue = values[field.name];
+
+        return {
+            ...payload,
+            [field.name]:
+                field.type === "number" && fieldValue !== ""
+                    ? Number(fieldValue)
+                    : fieldValue,
+        };
+    }, {});
+}
+
 export function ResourceFormPage({ resource, mode }) {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -118,10 +132,10 @@ export function ResourceFormPage({ resource, mode }) {
     }, [id, isEditMode, resource]);
 
     function handleChange(event) {
-        const { name, value, type } = event.target;
+        const { name, value } = event.target;
         setFormValues((currentValues) => ({
             ...currentValues,
-            [name]: type === "number" ? (value === "" ? "" : Number(value)) : value,
+            [name]: value,
         }));
     }
 
@@ -131,10 +145,12 @@ export function ResourceFormPage({ resource, mode }) {
         setError("");
 
         try {
+            const payload = buildSubmitPayload(resource, formValues);
+
             if (isEditMode) {
-                await resource.service.update(id, formValues);
+                await resource.service.update(id, payload);
             } else {
-                await resource.service.create(formValues);
+                await resource.service.create(payload);
             }
 
             navigate(`/${resource.path}`);
