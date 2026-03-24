@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { resourceRegistry } from "../resources/resourceRegistry.js";
 import { PageIntro } from "../../shared/ui/PageIntro.jsx";
 import { useAuth } from "../../shared/auth/AuthProvider.jsx";
+import { appEnv } from "../../shared/config/env.js";
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -42,7 +43,7 @@ function LoginPage() {
                         ASD Management
                     </p>
                     <h1 className="mt-4 text-4xl font-semibold text-[color:var(--app-ink)]">
-                        Accedi al gestionale
+                        Accesso Piattaforma
                     </h1>
                     <div className="mt-4 max-w-2xl space-y-2 text-sm leading-7 text-[color:var(--app-muted)]">
                         <p>Accesso interno riservato agli utenti già presenti nel sistema. Non è prevista registrazione pubblica.</p>
@@ -51,7 +52,7 @@ function LoginPage() {
                     <div className="mt-8 space-y-4">
                         <div className="rounded-2xl bg-[color:var(--app-surface)] p-4">
                             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--app-primary)]">
-                                Provisioning utenti
+                                Registrazione utenti
                             </p>
                             <p className="mt-2 text-sm text-[color:var(--app-muted)]">
                                 Gli account saranno creati a cura del personale dell'associazione
@@ -66,7 +67,7 @@ function LoginPage() {
                                 In caso di problemi con l'autenticazione contattare:
                             </p>
                             <p className="mt-2 text-sm font-medium text-[color:var(--app-ink)]">
-                                supporto@asd-management.local
+                                {appEnv.supportEmail}
                             </p>
                         </div>
                     </div>
@@ -81,7 +82,7 @@ function LoginPage() {
                             Login
                         </p>
                         <h2 className="mt-3 text-2xl font-semibold text-[color:var(--app-ink)]">
-                            Accesso Area Riservata
+                            Area Riservata
                         </h2>
                         <p className="mt-3 text-sm leading-6 text-[color:var(--app-muted)]">
                             Inserire Username e Password fornite dal personale dell'associazione sportiva.
@@ -122,7 +123,7 @@ function LoginPage() {
                         type="submit"
                         className="mt-8 inline-flex w-full items-center justify-center rounded-xl bg-[color:var(--app-primary)] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[color:var(--app-primary-strong)]"
                     >
-                        Entra nel gestionale
+                        Accedi
                     </button>
 
                     {error ? (
