@@ -9,7 +9,9 @@ export function StatusPanel({ title, description, tone = "neutral" }) {
     };
 
     return (
-        <div className={`rounded-[1.25rem] border px-5 py-4 shadow-sm ${tones[tone]}`}>
+        <div
+            className={`rounded-[1.25rem] border px-5 py-4 shadow-sm ${tones[tone] ?? tones.neutral}`}
+        >
             <p className="text-sm font-semibold">{title}</p>
             <p className="mt-1 text-sm opacity-80">{description}</p>
         </div>
