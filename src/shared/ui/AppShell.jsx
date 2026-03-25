@@ -1,18 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { resourceRegistry } from "../../features/resources/resourceRegistry.js";
+import { moduleSections } from "../../app/moduleCatalog.js";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import { appEnv } from "../config/env.js";
-
-function groupBySection(resources) {
-    return resources.reduce((sections, resource) => {
-        const currentSection = sections[resource.section] ?? [];
-        currentSection.push(resource);
-        sections[resource.section] = currentSection;
-        return sections;
-    }, {});
-}
-
-const sections = groupBySection(resourceRegistry);
 
 export function AppShell() {
     const navigate = useNavigate();
@@ -61,27 +50,41 @@ export function AppShell() {
                             </NavLink>
                         </div>
 
-                        {Object.entries(sections).map(([sectionName, resources]) => (
+                        {Object.entries(moduleSections).map(([sectionName, modules]) => (
                             <div key={sectionName}>
                                 <p className="mb-2 text-xs uppercase tracking-[0.3em] text-slate-400">
                                     {sectionName}
                                 </p>
                                 <div className="space-y-1">
-                                    {resources.map((resource) => (
-                                        <NavLink
-                                            key={resource.key}
-                                            to={`/${resource.path}`}
-                                            className={({ isActive }) =>
-                                                `block rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                                                    isActive
-                                                        ? "bg-[color:var(--app-primary)] text-white shadow-[0_10px_24px_rgba(28,165,107,0.28)]"
-                                                        : "text-slate-200 hover:bg-white/8"
-                                                }`
-                                            }
-                                        >
-                                            {resource.labels.plural}
-                                        </NavLink>
-                                    ))}
+                                    {modules.map((module) =>
+                                        module.status === "live" ? (
+                                            <NavLink
+                                                key={module.key}
+                                                to={module.path}
+                                                className={({ isActive }) =>
+                                                    `block rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                                                        isActive
+                                                            ? "bg-[color:var(--app-primary)] text-white shadow-[0_10px_24px_rgba(28,165,107,0.28)]"
+                                                            : "text-slate-200 hover:bg-white/8"
+                                                    }`
+                                                }
+                                            >
+                                                {module.title}
+                                            </NavLink>
+                                        ) : (
+                                            <div
+                                                key={module.key}
+                                                className="rounded-xl border border-white/10 px-3 py-2.5 text-sm text-slate-300/85"
+                                            >
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <span>{module.title}</span>
+                                                    <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                                                        {module.status === "standby" ? "Standby" : "Planned"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ),
+                                    )}
                                 </div>
                             </div>
                         ))}

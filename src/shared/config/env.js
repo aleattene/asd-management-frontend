@@ -10,6 +10,7 @@ function normalizePath(path) {
 }
 
 export const appEnv = {
+    applicationName: import.meta.env.VITE_APP_NAME?.trim() || "ASD Management",
     apiBaseUrl: import.meta.env.VITE_API_BASE_URL?.trim()
         ? normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL.trim())
         : "",
@@ -17,7 +18,6 @@ export const appEnv = {
         ? normalizePath(import.meta.env.VITE_AUTH_LOGIN_PATH.trim())
         : "",
     enableMockAuth: import.meta.env.VITE_ENABLE_MOCK_AUTH === "true",
-    applicationName: import.meta.env.VITE_APPLICATION_NAME?.trim() || "ASD Management",
     associationName: import.meta.env.VITE_ASSOCIATION_NAME?.trim() || "ASD Name",
     appTagline:
         import.meta.env.VITE_APP_TAGLINE?.trim() ||
