@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { resourceRegistry } from "../../features/resources/resourceRegistry.js";
 import { useAuth } from "../auth/AuthProvider.jsx";
+import { appEnv } from "../config/env.js";
 
 function groupBySection(resources) {
     return resources.reduce((sections, resource) => {
@@ -31,13 +32,13 @@ export function AppShell() {
                         className="block rounded-[1.25rem] border border-white/10 bg-white/5 px-4 py-4 transition hover:bg-white/10"
                     >
                         <div className="inline-flex items-center rounded-full bg-white/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-[color:var(--app-accent)]">
-                            ASD Management
+                            {appEnv.applicationName}
                         </div>
                         <h1 className="mt-4 text-[2rem] font-semibold leading-tight text-white">
-                            Gestionale sportivo collegato a Django/DRF
+                            {appEnv.associationName}
                         </h1>
                         <p className="mt-3 text-sm leading-6 text-slate-300">
-                            Accesso protetto con moduli CRUD raccolti nella navigazione laterale.
+                            {appEnv.appTagline}
                         </p>
                     </NavLink>
 
@@ -73,7 +74,7 @@ export function AppShell() {
                                             className={({ isActive }) =>
                                                 `block rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                                                     isActive
-                                                        ? "bg-white text-[color:var(--app-panel)]"
+                                                        ? "bg-[color:var(--app-primary)] text-white shadow-[0_10px_24px_rgba(28,165,107,0.28)]"
                                                         : "text-slate-200 hover:bg-white/8"
                                                 }`
                                             }

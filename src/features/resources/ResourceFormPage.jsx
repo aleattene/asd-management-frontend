@@ -199,7 +199,11 @@ export function ResourceFormPage({ resource, mode }) {
                     onChange={handleChange}
                     onSubmit={handleSubmit}
                     onCancel={() => navigate(`/${resource.path}`)}
-                    submitLabel={isEditMode ? "Salva modifiche" : "Crea record"}
+                    submitLabel={
+                        isEditMode
+                            ? `Salva ${resource.labels.singular}`
+                            : `Aggiungi ${resource.labels.singular}`
+                    }
                 />
             ) : null}
         </section>
