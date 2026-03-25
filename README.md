@@ -2,6 +2,11 @@
 
 Frontend React/Vite per la gestione di un'associazione sportiva.
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/8d5c1b60-cbc3-4e95-8602-30949fbc942d/deploy-status)](https://app.netlify.com/sites/asd-management/deploys)
+[![codecov](https://codecov.io/gh/aleattene/asd-management-frontend/branch/main/graph/badge.svg?token=TBZQE4DBR3)](https://codecov.io/gh/aleattene/asd-management-frontend)
+
+Deploy: https://asd-management.netlify.app/
+
 Il progetto si concentra attualmente su:
 - accesso riservato con login interno
 - struttura modulare per CRUD amministrativi e documentali
