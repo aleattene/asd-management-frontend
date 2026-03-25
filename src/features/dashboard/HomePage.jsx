@@ -1,9 +1,30 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { resourceRegistry } from "../resources/resourceRegistry.js";
+import { moduleSections } from "../../app/moduleCatalog.js";
 import { PageIntro } from "../../shared/ui/PageIntro.jsx";
 import { useAuth } from "../../shared/auth/AuthProvider.jsx";
 import { appEnv } from "../../shared/config/env.js";
+
+function formatDisplayName(username) {
+    if (!username) {
+        return "Utente";
+    }
+
+    return username
+        .split(/[.\s_-]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
+}
+
+function getInitials(displayName) {
+    return displayName
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join("");
+}
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -136,44 +157,67 @@ function LoginPage() {
 }
 
 function DashboardPage() {
+    const { username } = useAuth();
+    const modules = Object.values(moduleSections).flat();
+    const displayName = formatDisplayName(username);
+    const initials = getInitials(displayName);
+
     return (
         <section className="space-y-6">
             <PageIntro
-                eyebrow="Overview"
-                title="Dashboard operativa"
-                description="Area protetta dell'applicazione. Da qui puoi aprire i moduli CRUD e continuare l'evoluzione del gestionale step by step."
+                eyebrow="Benvenuto"
+                title="Area riservata"
+                description={`${displayName}, da qui puoi consultare le sezioni attive del gestionale e vedere le aree gia' pianificate per i prossimi rilasci.`}
+                action={
+                    <div className="flex items-center gap-4 rounded-[1.25rem] bg-[color:var(--app-surface)] px-4 py-3">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--app-panel)] text-lg font-semibold text-white">
+                            {initials}
+                        </div>
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--app-primary)]">
+                                Profilo attivo
+                            </p>
+                            <p className="mt-1 text-base font-semibold text-[color:var(--app-ink)]">
+                                {displayName}
+                            </p>
+                            <p className="text-sm text-[color:var(--app-muted)]">
+                                Accesso alla piattaforma gestionale
+                            </p>
+                        </div>
+                    </div>
+                }
             />
 
             <div className="grid gap-4 xl:grid-cols-2">
-                {resourceRegistry.map((resource) => (
+                {modules.map((module) => (
                     <article
-                        key={resource.key}
+                        key={module.key}
                         className="rounded-[1.5rem] border border-[color:var(--app-border)] bg-[color:var(--app-surface-strong)] p-6 shadow-[0_14px_40px_rgba(20,36,60,0.08)]"
                     >
                         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[color:var(--app-primary)]">
-                            {resource.section}
+                            {module.section}
                         </p>
                         <h3 className="mt-3 text-2xl font-semibold text-[color:var(--app-ink)]">
-                            {resource.labels.plural}
+                            {module.title}
                         </h3>
                         <p className="mt-3 text-sm leading-6 text-[color:var(--app-muted)]">
-                            {resource.description}
+                            {module.description}
                         </p>
 
-                        <div className="mt-6 flex flex-wrap gap-3">
-                            <Link
-                                to={`/${resource.path}`}
-                                className="btn btn-secondary"
-                            >
-                                Apri elenco
-                            </Link>
-                            <Link
-                                to={`/${resource.path}/new`}
-                                className="btn btn-outline"
-                            >
-                                Inserisci
-                            </Link>
-                        </div>
+                        {module.status === "live" ? (
+                            <div className="mt-6 flex flex-wrap gap-3">
+                                <Link to={module.path} className="btn btn-secondary">
+                                    Apri elenco
+                                </Link>
+                                <Link to={module.createPath} className="btn btn-outline">
+                                    Inserisci
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="mt-6 inline-flex rounded-full bg-[color:var(--app-surface)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--app-muted)]">
+                                {module.status === "standby" ? "In standby" : "In pianificazione"}
+                            </div>
+                        )}
                     </article>
                 ))}
             </div>

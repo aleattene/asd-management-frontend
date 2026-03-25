@@ -1,0 +1,79 @@
+import { resourceRegistry } from "../features/resources/resourceRegistry.js";
+
+const plannedModules = [
+    {
+        key: "partnerCompanies",
+        section: "Anagrafiche",
+        title: "Società partner",
+        description:
+            "Archivio società convenzionate o partner dell'associazione, con riferimenti e stato collaborazione.",
+        status: "planned",
+    },
+    {
+        key: "athleteEnrollments",
+        section: "Documentazione",
+        title: "Iscrizioni atleti",
+        description:
+            "Pratiche di iscrizione con stagione sportiva, quota, allegati e stato amministrativo.",
+        status: "planned",
+    },
+    {
+        key: "financialMovements",
+        section: "Amministrazione",
+        title: "Movimenti finanziari",
+        description:
+            "Entrate e uscite dell'associazione con causale, data competenza e riconciliazione.",
+        status: "planned",
+    },
+    {
+        key: "invoices",
+        section: "Amministrazione",
+        title: "Fatture",
+        description:
+            "Fatture di acquisto e vendita gestite in un unico modulo con tipologia documento.",
+        status: "planned",
+    },
+    {
+        key: "receipts",
+        section: "Amministrazione",
+        title: "Ricevute",
+        description:
+            "Ricevute di acquisto e vendita, con classificazione per tipologia e controparte.",
+        status: "planned",
+    },
+    {
+        key: "documentGeneration",
+        section: "Generazione documenti",
+        title: "Generazione documenti",
+        description:
+            "Area futura per produrre modulistica, attestazioni ed esportazioni PDF partendo dai dati gestionali.",
+        status: "standby",
+    },
+    {
+        key: "regionalCalls",
+        section: "Bandi",
+        title: "Bandi regionali",
+        description:
+            "Gestione bandi, scadenze, requisiti, rendicontazione e stato delle candidature regionali.",
+        status: "planned",
+    },
+];
+
+const liveModules = resourceRegistry.map((resource) => ({
+    key: resource.key,
+    section: resource.section,
+    title: resource.labels.plural,
+    description: resource.description,
+    status: "live",
+    path: `/${resource.path}`,
+    createPath: `/${resource.path}/new`,
+}));
+
+const allModules = [...liveModules, ...plannedModules];
+
+export const moduleSections = allModules.reduce((sections, module) => {
+    const currentSection = sections[module.section] ?? [];
+    currentSection.push(module);
+    sections[module.section] = currentSection;
+    return sections;
+}, {});
