@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { getErrorMessage } from "../../shared/api/client.js";
 import { PageIntro } from "../../shared/ui/PageIntro";
 import { StatusPanel } from "../../shared/ui/StatusPanel";
-import { ResourceTable } from "../../shared/ui/ResourceTable.jsx";
+import { ResourceTable } from "../../shared/ui/ResourceTable";
 import type { ResourceDefinition } from "../../shared/types/resources";
 
 type ResourceItem = Record<string, unknown> & { id: string | number };

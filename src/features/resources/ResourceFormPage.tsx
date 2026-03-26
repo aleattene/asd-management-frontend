@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getErrorMessage } from "../../shared/api/client.js";
 import { PageIntro } from "../../shared/ui/PageIntro";
 import { StatusPanel } from "../../shared/ui/StatusPanel";
-import { EntityForm } from "../../shared/ui/EntityForm.jsx";
+import { EntityForm } from "../../shared/ui/EntityForm";
 import type { ResourceDefinition, SelectOption } from "../../shared/types/resources";
 
 type FormValues = Record<string, string | number>;

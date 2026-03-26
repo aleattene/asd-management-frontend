@@ -1,6 +1,6 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import { AppShell } from "../shared/ui/AppShell";
-import { HomePage } from "../features/dashboard/HomePage.jsx";
+import { HomePage } from "../features/dashboard/HomePage";
 import { ResourceListPage } from "../features/resources/ResourceListPage";
 import { ResourceFormPage } from "../features/resources/ResourceFormPage";
 import { resourceRegistry } from "../features/resources/resourceRegistry";
@@ -16,7 +16,6 @@ function ProtectedLayout() {
     return <AppShell />;
 }
 
-// Each registered resource generates the standard CRUD routes used by the app.
 const resourceRoutes = resourceRegistry.flatMap((resource) => [
     {
         path: resource.path,
@@ -48,7 +47,6 @@ export const router = createBrowserRouter([
                 path: "/overview",
                 element: <HomePage mode="dashboard" />,
             },
-            // Resource routes are nested here so they all render inside the shared shell layout.
             ...resourceRoutes,
         ],
     },

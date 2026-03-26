@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { moduleSections } from "../../app/moduleCatalog";
 import { PageIntro } from "../../shared/ui/PageIntro";
 import { useAuth } from "../../shared/auth/AuthProvider";
 import { appEnv } from "../../shared/config/env";
+import type { ModuleDefinition } from "../../shared/types/resources";
 
-function formatDisplayName(username) {
+function formatDisplayName(username: string) {
     if (!username) {
         return "Utente";
     }
@@ -17,7 +18,7 @@ function formatDisplayName(username) {
         .join(" ");
 }
 
-function getInitials(displayName) {
+function getInitials(displayName: string) {
     return displayName
         .split(" ")
         .filter(Boolean)
@@ -36,7 +37,7 @@ function LoginPage() {
         return <Navigate to="/overview" replace />;
     }
 
-    function handleChange(event) {
+    function handleChange(event: ChangeEvent<HTMLInputElement>) {
         const { name, value } = event.target;
         setCredentials((currentValues) => ({
             ...currentValues,
@@ -44,7 +45,7 @@ function LoginPage() {
         }));
     }
 
-    async function handleSubmit(event) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setError("");
 
@@ -67,7 +68,10 @@ function LoginPage() {
                         Accesso Piattaforma
                     </h1>
                     <div className="mt-4 max-w-2xl space-y-2 text-sm leading-7 text-[color:var(--app-muted)]">
-                        <p>Accesso interno riservato agli utenti già presenti nel sistema. Non è prevista registrazione pubblica.</p>
+                        <p>
+                            Accesso interno riservato agli utenti gia' presenti nel sistema. Non e'
+                            prevista registrazione pubblica.
+                        </p>
                     </div>
 
                     <div className="mt-8 space-y-4">
@@ -147,9 +151,7 @@ function LoginPage() {
                         Accedi
                     </button>
 
-                    {error ? (
-                        <p className="mt-4 text-sm text-[color:var(--app-danger)]">{error}</p>
-                    ) : null}
+                    {error ? <p className="mt-4 text-sm text-[color:var(--app-danger)]">{error}</p> : null}
                 </form>
             </div>
         </section>
@@ -158,7 +160,7 @@ function LoginPage() {
 
 function DashboardPage() {
     const { username } = useAuth();
-    const modules = Object.values(moduleSections).flat();
+    const modules = Object.values(moduleSections).flat() as ModuleDefinition[];
     const displayName = formatDisplayName(username);
     const initials = getInitials(displayName);
 
@@ -204,7 +206,7 @@ function DashboardPage() {
                             {module.description}
                         </p>
 
-                        {module.status === "live" ? (
+                        {module.status === "live" && module.path && module.createPath ? (
                             <div className="mt-6 flex flex-wrap gap-3">
                                 <Link to={module.path} className="btn btn-secondary">
                                     Apri elenco
@@ -225,7 +227,11 @@ function DashboardPage() {
     );
 }
 
-export function HomePage({ mode = "login" }) {
+interface HomePageProps {
+    mode?: "login" | "dashboard";
+}
+
+export function HomePage({ mode = "login" }: HomePageProps) {
     if (mode === "dashboard") {
         return <DashboardPage />;
     }
