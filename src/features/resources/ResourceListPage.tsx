@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getErrorMessage } from "../../shared/api/client.js";
-import { PageIntro } from "../../shared/ui/PageIntro.jsx";
-import { StatusPanel } from "../../shared/ui/StatusPanel.jsx";
+import { PageIntro } from "../../shared/ui/PageIntro";
+import { StatusPanel } from "../../shared/ui/StatusPanel";
 import { ResourceTable } from "../../shared/ui/ResourceTable.jsx";
+import type { ResourceDefinition } from "../../shared/types/resources";
 
-export function ResourceListPage({ resource }) {
-    const [items, setItems] = useState([]);
+type ResourceItem = Record<string, unknown> & { id: string | number };
+
+interface ResourceListPageProps {
+    resource: ResourceDefinition;
+}
+
+export function ResourceListPage({ resource }: ResourceListPageProps) {
+    const [items, setItems] = useState<ResourceItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -20,7 +27,7 @@ export function ResourceListPage({ resource }) {
             try {
                 const data = await resource.service.list();
                 if (!cancelled) {
-                    setItems(Array.isArray(data) ? data : []);
+                    setItems(Array.isArray(data) ? (data as ResourceItem[]) : []);
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -45,7 +52,7 @@ export function ResourceListPage({ resource }) {
         };
     }, [resource]);
 
-    async function handleDelete(item) {
+    async function handleDelete(item: ResourceItem) {
         const confirmed = window.confirm(
             `Confermi l'eliminazione di questo ${resource.labels.singular}?`,
         );
@@ -57,7 +64,7 @@ export function ResourceListPage({ resource }) {
         try {
             await resource.service.remove(item.id);
             const data = await resource.service.list();
-            setItems(Array.isArray(data) ? data : []);
+            setItems(Array.isArray(data) ? (data as ResourceItem[]) : []);
         } catch (err) {
             window.alert(
                 getErrorMessage(
@@ -75,28 +82,19 @@ export function ResourceListPage({ resource }) {
                 title={resource.labels.plural}
                 description={resource.description}
                 action={
-                    <Link
-                        to={`/${resource.path}/new`}
-                        className="btn btn-primary"
-                    >
+                    <Link to={`/${resource.path}/new`} className="btn btn-primary">
                         Nuovo {resource.labels.singular}
                     </Link>
                 }
             />
 
             <div className="grid gap-4 md:grid-cols-3">
-                <StatusPanel
-                    title="Risorsa"
-                    description={resource.labels.plural}
-                />
+                <StatusPanel title="Risorsa" description={resource.labels.plural} />
                 <StatusPanel
                     title="Record caricati"
                     description={isLoading ? "..." : `${items.length}`}
                 />
-                <StatusPanel
-                    title="Route"
-                    description={resource.path}
-                />
+                <StatusPanel title="Route" description={resource.path} />
             </div>
 
             {isLoading ? (
@@ -107,9 +105,7 @@ export function ResourceListPage({ resource }) {
                 />
             ) : null}
 
-            {error ? (
-                <StatusPanel tone="error" title="Errore API" description={error} />
-            ) : null}
+            {error ? <StatusPanel tone="error" title="Errore API" description={error} /> : null}
 
             {!isLoading && !error && items.length === 0 ? (
                 <StatusPanel
@@ -119,11 +115,7 @@ export function ResourceListPage({ resource }) {
             ) : null}
 
             {!isLoading && !error && items.length > 0 ? (
-                <ResourceTable
-                    resource={resource}
-                    items={items}
-                    onDelete={handleDelete}
-                />
+                <ResourceTable resource={resource} items={items} onDelete={handleDelete} />
             ) : null}
         </section>
     );

@@ -1,7 +1,21 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { moduleSections } from "../../app/moduleCatalog.js";
-import { useAuth } from "../auth/AuthProvider.jsx";
-import { appEnv } from "../config/env.js";
+import { moduleSections } from "../../app/moduleCatalog";
+import type { ModuleDefinition } from "../types/resources";
+import { useAuth } from "../auth/AuthProvider";
+import { appEnv } from "../config/env";
+
+function PlaceholderModule({ module }: { module: ModuleDefinition }) {
+    return (
+        <div className="rounded-xl border border-white/10 px-3 py-2.5 text-sm text-slate-300/85">
+            <div className="flex items-center justify-between gap-3">
+                <span>{module.title}</span>
+                <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                    {module.status === "standby" ? "Standby" : "Planned"}
+                </span>
+            </div>
+        </div>
+    );
+}
 
 export function AppShell() {
     const navigate = useNavigate();
@@ -26,9 +40,7 @@ export function AppShell() {
                         <h1 className="mt-4 text-[2rem] font-semibold leading-tight text-white">
                             {appEnv.associationName}
                         </h1>
-                        <p className="mt-3 text-sm leading-6 text-slate-300">
-                            {appEnv.appTagline}
-                        </p>
+                        <p className="mt-3 text-sm leading-6 text-slate-300">{appEnv.appTagline}</p>
                     </NavLink>
 
                     <nav className="mt-8 space-y-6">
@@ -57,7 +69,7 @@ export function AppShell() {
                                 </p>
                                 <div className="space-y-1">
                                     {modules.map((module) =>
-                                        module.status === "live" ? (
+                                        module.status === "live" && module.path ? (
                                             <NavLink
                                                 key={module.key}
                                                 to={module.path}
@@ -72,17 +84,7 @@ export function AppShell() {
                                                 {module.title}
                                             </NavLink>
                                         ) : (
-                                            <div
-                                                key={module.key}
-                                                className="rounded-xl border border-white/10 px-3 py-2.5 text-sm text-slate-300/85"
-                                            >
-                                                <div className="flex items-center justify-between gap-3">
-                                                    <span>{module.title}</span>
-                                                    <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                                                        {module.status === "standby" ? "Standby" : "Planned"}
-                                                    </span>
-                                                </div>
-                                            </div>
+                                            <PlaceholderModule key={module.key} module={module} />
                                         ),
                                     )}
                                 </div>

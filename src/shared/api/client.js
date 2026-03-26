@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getApiBaseUrl } from "../config/env.js";
+import { getApiBaseUrl } from "../config/env";
 
 export const AUTH_STORAGE_KEYS = {
     accessToken: "asd-management.auth.access-token",

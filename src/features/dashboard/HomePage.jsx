@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { moduleSections } from "../../app/moduleCatalog.js";
-import { PageIntro } from "../../shared/ui/PageIntro.jsx";
-import { useAuth } from "../../shared/auth/AuthProvider.jsx";
-import { appEnv } from "../../shared/config/env.js";
+import { moduleSections } from "../../app/moduleCatalog";
+import { PageIntro } from "../../shared/ui/PageIntro";
+import { useAuth } from "../../shared/auth/AuthProvider";
+import { appEnv } from "../../shared/config/env";
 
 function formatDisplayName(username) {
     if (!username) {

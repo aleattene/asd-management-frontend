@@ -1,15 +1,25 @@
-function normalizeBaseUrl(baseUrl) {
+function normalizeBaseUrl(baseUrl: string) {
     return baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
 }
 
-function normalizePath(path) {
+function normalizePath(path: string) {
     return path
         .split("/")
         .filter(Boolean)
         .join("/");
 }
 
-export const appEnv = {
+export interface AppEnv {
+    applicationName: string;
+    apiBaseUrl: string;
+    authLoginPath: string;
+    enableMockAuth: boolean;
+    associationName: string;
+    appTagline: string;
+    supportEmail: string;
+}
+
+export const appEnv: AppEnv = {
     applicationName: import.meta.env.VITE_APP_NAME?.trim() || "ASD Management",
     apiBaseUrl: import.meta.env.VITE_API_BASE_URL?.trim()
         ? normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL.trim())

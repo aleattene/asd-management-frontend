@@ -1,10 +1,10 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
-import { AppShell } from "../shared/ui/AppShell.jsx";
+import { AppShell } from "../shared/ui/AppShell";
 import { HomePage } from "../features/dashboard/HomePage.jsx";
-import { ResourceListPage } from "../features/resources/ResourceListPage.jsx";
-import { ResourceFormPage } from "../features/resources/ResourceFormPage.jsx";
-import { resourceRegistry } from "../features/resources/resourceRegistry.js";
-import { useAuth } from "../shared/auth/AuthProvider.jsx";
+import { ResourceListPage } from "../features/resources/ResourceListPage";
+import { ResourceFormPage } from "../features/resources/ResourceFormPage";
+import { resourceRegistry } from "../features/resources/resourceRegistry";
+import { useAuth } from "../shared/auth/AuthProvider";
 
 function ProtectedLayout() {
     const { isAuthenticated } = useAuth();

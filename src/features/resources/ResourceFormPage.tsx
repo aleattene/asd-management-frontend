@@ -1,53 +1,52 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getErrorMessage } from "../../shared/api/client.js";
-import { PageIntro } from "../../shared/ui/PageIntro.jsx";
-import { StatusPanel } from "../../shared/ui/StatusPanel.jsx";
+import { PageIntro } from "../../shared/ui/PageIntro";
+import { StatusPanel } from "../../shared/ui/StatusPanel";
 import { EntityForm } from "../../shared/ui/EntityForm.jsx";
+import type { ResourceDefinition, SelectOption } from "../../shared/types/resources";
 
-function buildInitialValues(resource) {
-    return resource.fields.reduce((values, field) => {
-        return {
-            ...values,
-            [field.name]: "",
-        };
+type FormValues = Record<string, string | number>;
+type FormRecord = Record<string, unknown>;
+
+function buildInitialValues(resource: ResourceDefinition): FormValues {
+    return resource.fields.reduce<FormValues>((values, field) => {
+        values[field.name] = "";
+        return values;
     }, {});
 }
 
-function normalizeRecord(resource, record) {
-    return resource.fields.reduce((values, field) => {
+function normalizeRecord(resource: ResourceDefinition, record: FormRecord): FormValues {
+    return resource.fields.reduce<FormValues>((values, field) => {
         const fieldValue = record?.[field.name];
-        return {
-            ...values,
-            [field.name]:
-                field.type === "select" && typeof fieldValue === "object"
-                    ? fieldValue?.id ?? ""
-                    : fieldValue ?? "",
-        };
+        values[field.name] =
+            field.type === "select" && typeof fieldValue === "object" && fieldValue !== null
+                ? (((fieldValue as { id?: string | number }).id ?? "") as string | number)
+                : ((fieldValue ?? "") as string | number);
+        return values;
     }, {});
 }
 
-function buildSubmitPayload(resource, values) {
-    return resource.fields.reduce((payload, field) => {
+function buildSubmitPayload(resource: ResourceDefinition, values: FormValues) {
+    return resource.fields.reduce<Record<string, string | number>>((payload, field) => {
         const fieldValue = values[field.name];
-
-        return {
-            ...payload,
-            [field.name]:
-                field.type === "number" && fieldValue !== ""
-                    ? Number(fieldValue)
-                    : fieldValue,
-        };
+        payload[field.name] = field.type === "number" && fieldValue !== "" ? Number(fieldValue) : fieldValue;
+        return payload;
     }, {});
 }
 
-export function ResourceFormPage({ resource, mode }) {
+interface ResourceFormPageProps {
+    resource: ResourceDefinition;
+    mode: "create" | "edit";
+}
+
+export function ResourceFormPage({ resource, mode }: ResourceFormPageProps) {
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditMode = mode === "edit";
 
-    const [formValues, setFormValues] = useState(buildInitialValues(resource));
-    const [selectOptions, setSelectOptions] = useState({});
+    const [formValues, setFormValues] = useState<FormValues>(buildInitialValues(resource));
+    const [selectOptions, setSelectOptions] = useState<Record<string, SelectOption[]>>({});
     const [isLoading, setIsLoading] = useState(isEditMode);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState("");
@@ -60,12 +59,10 @@ export function ResourceFormPage({ resource, mode }) {
 
             try {
                 const optionEntries = await Promise.all(
-                    Object.entries(resource.optionLoaders).map(
-                        async ([fieldName, loadOptions]) => [
-                            fieldName,
-                            await loadOptions(),
-                        ],
-                    ),
+                    Object.entries(resource.optionLoaders).map(async ([fieldName, loadOptions]) => [
+                        fieldName,
+                        await loadOptions(),
+                    ]),
                 );
 
                 if (!cancelled) {
@@ -106,7 +103,7 @@ export function ResourceFormPage({ resource, mode }) {
             try {
                 const data = await resource.service.getById(id);
                 if (!cancelled) {
-                    setFormValues(normalizeRecord(resource, data));
+                    setFormValues(normalizeRecord(resource, data as FormRecord));
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -131,7 +128,7 @@ export function ResourceFormPage({ resource, mode }) {
         };
     }, [id, isEditMode, resource]);
 
-    function handleChange(event) {
+    function handleChange(event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
         const { name, value } = event.target;
         setFormValues((currentValues) => ({
             ...currentValues,
@@ -139,7 +136,7 @@ export function ResourceFormPage({ resource, mode }) {
         }));
     }
 
-    async function handleSubmit(event) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setIsSubmitting(true);
         setError("");
@@ -170,11 +167,7 @@ export function ResourceFormPage({ resource, mode }) {
         <section className="space-y-6">
             <PageIntro
                 eyebrow={resource.section}
-                title={
-                    isEditMode
-                        ? `Modifica ${resource.labels.singular}`
-                        : `Nuovo ${resource.labels.singular}`
-                }
+                title={isEditMode ? `Modifica ${resource.labels.singular}` : `Nuovo ${resource.labels.singular}`}
                 description={resource.description}
             />
 
@@ -186,9 +179,7 @@ export function ResourceFormPage({ resource, mode }) {
                 />
             ) : null}
 
-            {error ? (
-                <StatusPanel tone="error" title="Errore" description={error} />
-            ) : null}
+            {error ? <StatusPanel tone="error" title="Errore" description={error} /> : null}
 
             {!isLoading ? (
                 <EntityForm
