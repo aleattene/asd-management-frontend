@@ -22,10 +22,10 @@ export interface SelectOption {
 
 export interface CrudService {
     list: () => Promise<unknown>;
-    getById: (id: string | number | undefined) => Promise<unknown>;
+    getById: (id: string | number) => Promise<unknown>;
     create: (payload: Record<string, unknown>) => Promise<unknown>;
-    update: (id: string | number | undefined, payload: Record<string, unknown>) => Promise<unknown>;
-    remove: (id: string | number | undefined) => Promise<unknown>;
+    update: (id: string | number, payload: Record<string, unknown>) => Promise<unknown>;
+    remove: (id: string | number) => Promise<unknown>;
 }
 
 export interface ResourceDefinition {

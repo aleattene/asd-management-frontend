@@ -97,6 +97,12 @@ export function ResourceFormPage({ resource, mode }: ResourceFormPageProps) {
                 return;
             }
 
+            if (!id) {
+                setError("Identificativo risorsa mancante.");
+                setIsLoading(false);
+                return;
+            }
+
             setIsLoading(true);
             setError("");
 
@@ -145,6 +151,10 @@ export function ResourceFormPage({ resource, mode }: ResourceFormPageProps) {
             const payload = buildSubmitPayload(resource, formValues);
 
             if (isEditMode) {
+                if (!id) {
+                    throw new Error("Identificativo risorsa mancante.");
+                }
+
                 await resource.service.update(id, payload);
             } else {
                 await resource.service.create(payload);
