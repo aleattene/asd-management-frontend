@@ -5,6 +5,7 @@ const athletesService = createCrudService("profiles/athletes");
 const categoriesService = createCrudService("profiles/athletes-categories");
 const trainersService = createCrudService("profiles/trainers");
 const sportDoctorsService = createCrudService("profiles/sport-doctors");
+const partnerCompaniesService = createCrudService("customers/companies");
 const paymentsService = createCrudService("payments/payments");
 const sportCertificatesService = createCrudService(
     "documentation/sport-certificates",
@@ -58,6 +59,15 @@ export const resourceRegistry: ResourceDefinition[] = [
                 type: "text",
                 required: true,
                 maxLength: 16,
+                copyFrom: "vat_number",
+                copyWhen: {
+                    field: "vat_equals_fc",
+                    value: true,
+                },
+                readOnlyWhen: {
+                    field: "vat_equals_fc",
+                    value: true,
+                },
             },
             {
                 name: "category",
@@ -103,6 +113,15 @@ export const resourceRegistry: ResourceDefinition[] = [
                 type: "text",
                 required: true,
                 maxLength: 16,
+                copyFrom: "vat_number",
+                copyWhen: {
+                    field: "vat_equals_fc",
+                    value: true,
+                },
+                readOnlyWhen: {
+                    field: "vat_equals_fc",
+                    value: true,
+                },
             },
         ],
         optionLoaders: {},
@@ -136,6 +155,84 @@ export const resourceRegistry: ResourceDefinition[] = [
             },
         ],
         optionLoaders: {},
+    },
+    {
+        key: "partnerCompanies",
+        path: "partner-companies",
+        section: "Anagrafiche",
+        labels: {
+            singular: "societa' partner",
+            plural: "Societa' partner",
+        },
+        description:
+            "Archivio societa' convenzionate o partner dell'associazione, con riferimenti principali e stato collaborazione.",
+        service: partnerCompaniesService,
+        columns: [
+            { key: "business_name", label: "Ragione sociale" },
+            { key: "vat_number", label: "Partita IVA" },
+            { key: "fiscal_code", label: "Codice fiscale" },
+            { key: "is_active", label: "Attiva" },
+            { key: "created_at", label: "Creata il" },
+        ],
+        fields: [
+            {
+                name: "business_name",
+                label: "Ragione sociale",
+                type: "text",
+                required: true,
+            },
+            {
+                name: "vat_number",
+                label: "Partita IVA",
+                type: "text",
+                required: true,
+                maxLength: 11,
+            },
+            {
+                name: "fiscal_code",
+                label: "Codice fiscale",
+                type: "text",
+                required: true,
+                maxLength: 16,
+                copyFrom: "vat_number",
+                copyWhen: {
+                    field: "vat_equals_fc",
+                    value: true,
+                },
+                readOnlyWhen: {
+                    field: "vat_equals_fc",
+                    value: true,
+                },
+            },
+            {
+                name: "vat_equals_fc",
+                label: "Partita IVA uguale a Codice fiscale",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona opzione",
+                defaultValue: true,
+                valueType: "boolean",
+            },
+            {
+                name: "is_active",
+                label: "Societa' attiva",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona stato",
+                defaultValue: true,
+                valueType: "boolean",
+            },
+        ],
+        optionLoaders: {
+            vat_equals_fc: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
+            is_active: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
+        },
     },
     {
         key: "payments",

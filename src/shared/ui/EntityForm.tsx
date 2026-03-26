@@ -28,6 +28,18 @@ function normalizeValue(field: ResourceFieldDefinition, value: unknown) {
     return (value ?? "") as string | number;
 }
 
+function normalizeComparableValue(value: string | number | boolean) {
+    return typeof value === "boolean" ? String(value) : value;
+}
+
+function isFieldReadOnly(field: ResourceFieldDefinition, values: FormValues) {
+    if (!field.readOnlyWhen) {
+        return false;
+    }
+
+    return values[field.readOnlyWhen.field] === normalizeComparableValue(field.readOnlyWhen.value);
+}
+
 export function EntityForm({
     resource,
     values,
@@ -48,6 +60,12 @@ export function EntityForm({
                     const options = selectOptions[field.name] ?? [];
                     const inputValue = normalizeValue(field, values[field.name]);
                     const wideField = field.type === "textarea";
+                    const readOnly = isFieldReadOnly(field, values);
+                    const inputClassName = `w-full rounded-xl border border-[color:var(--app-border)] px-4 py-3 text-[color:var(--app-ink)] outline-none transition ${
+                        readOnly
+                            ? "cursor-not-allowed bg-slate-100 text-slate-500"
+                            : "bg-slate-50 focus:border-[color:var(--app-primary)] focus:bg-white"
+                    }`;
 
                     return (
                         <label key={field.name} className={wideField ? "md:col-span-2" : ""}>
@@ -60,8 +78,9 @@ export function EntityForm({
                                     name={field.name}
                                     value={inputValue}
                                     onChange={onChange}
+                                    disabled={readOnly}
                                     required={field.required}
-                                    className="w-full rounded-xl border border-[color:var(--app-border)] bg-slate-50 px-4 py-3 text-[color:var(--app-ink)] outline-none transition focus:border-[color:var(--app-primary)] focus:bg-white"
+                                    className={inputClassName}
                                 >
                                     <option value="">{field.placeholder ?? "Seleziona"}</option>
                                     {options.map((option) => (
@@ -75,11 +94,12 @@ export function EntityForm({
                                     name={field.name}
                                     value={inputValue}
                                     onChange={onChange}
+                                    readOnly={readOnly}
                                     required={field.required}
                                     maxLength={field.maxLength}
                                     placeholder={field.placeholder}
                                     rows={5}
-                                    className="w-full rounded-xl border border-[color:var(--app-border)] bg-slate-50 px-4 py-3 text-[color:var(--app-ink)] outline-none transition focus:border-[color:var(--app-primary)] focus:bg-white"
+                                    className={inputClassName}
                                 />
                             ) : (
                                 <input
@@ -87,10 +107,11 @@ export function EntityForm({
                                     name={field.name}
                                     value={inputValue}
                                     onChange={onChange}
+                                    readOnly={readOnly}
                                     required={field.required}
                                     maxLength={field.maxLength}
                                     placeholder={field.placeholder}
-                                    className="w-full rounded-xl border border-[color:var(--app-border)] bg-slate-50 px-4 py-3 text-[color:var(--app-ink)] outline-none transition focus:border-[color:var(--app-primary)] focus:bg-white"
+                                    className={inputClassName}
                                 />
                             )}
                         </label>
