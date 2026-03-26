@@ -12,7 +12,7 @@ import {
     getStoredUsername,
     setStoredTokens,
     setStoredUsername,
-} from "../api/client.js";
+} from "../api/client";
 import { appEnv, getAuthLoginPath } from "../config/env";
 
 interface AuthState {

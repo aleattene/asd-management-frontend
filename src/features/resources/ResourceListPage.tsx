@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getErrorMessage } from "../../shared/api/client.js";
+import { getErrorMessage } from "../../shared/api/client";
 import { PageIntro } from "../../shared/ui/PageIntro";
 import { StatusPanel } from "../../shared/ui/StatusPanel";
 import { ResourceTable } from "../../shared/ui/ResourceTable";

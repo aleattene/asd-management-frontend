@@ -1,13 +1,14 @@
-import { apiClient } from "./client.js";
+import { apiClient } from "./client";
+import type { CrudService } from "../types/resources";
 
-function normalizePath(path) {
+function normalizePath(path: string) {
     return path
         .split("/")
         .filter(Boolean)
         .join("/");
 }
 
-export function createCrudService(path) {
+export function createCrudService(path: string): CrudService {
     const resourcePath = `${normalizePath(path)}/`;
 
     return {

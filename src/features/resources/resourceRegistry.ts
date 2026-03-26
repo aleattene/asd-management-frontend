@@ -1,4 +1,4 @@
-import { createCrudService } from "../../shared/api/createCrudService.js";
+import { createCrudService } from "../../shared/api/createCrudService";
 import type { ResourceDefinition, SelectOption } from "../../shared/types/resources";
 
 const athletesService = createCrudService("profiles/athletes");

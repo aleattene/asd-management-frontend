@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getErrorMessage } from "../../shared/api/client.js";
+import { getErrorMessage } from "../../shared/api/client";
 import { PageIntro } from "../../shared/ui/PageIntro";
 import { StatusPanel } from "../../shared/ui/StatusPanel";
 import { EntityForm } from "../../shared/ui/EntityForm";
