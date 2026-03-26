@@ -1,9 +1,31 @@
-function normalizeValue(field, value) {
+import type {
+    ResourceDefinition,
+    ResourceFieldDefinition,
+    SelectOption,
+} from "../types/resources";
+import type { ChangeEvent, FormEvent } from "react";
+
+type FormValues = Record<string, string | number>;
+
+type EntityFormChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
+
+interface EntityFormProps {
+    resource: ResourceDefinition;
+    values: FormValues;
+    selectOptions: Record<string, SelectOption[]>;
+    isSubmitting: boolean;
+    onChange: (event: EntityFormChangeEvent) => void;
+    onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+    onCancel: () => void;
+    submitLabel: string;
+}
+
+function normalizeValue(field: ResourceFieldDefinition, value: unknown) {
     if (field.type === "select" && typeof value === "object" && value !== null) {
-        return value.id ?? "";
+        return (value as { id?: string | number }).id ?? "";
     }
 
-    return value ?? "";
+    return (value ?? "") as string | number;
 }
 
 export function EntityForm({
@@ -15,7 +37,7 @@ export function EntityForm({
     onSubmit,
     onCancel,
     submitLabel,
-}) {
+}: EntityFormProps) {
     return (
         <form
             onSubmit={onSubmit}
@@ -28,10 +50,7 @@ export function EntityForm({
                     const wideField = field.type === "textarea";
 
                     return (
-                        <label
-                            key={field.name}
-                            className={wideField ? "md:col-span-2" : ""}
-                        >
+                        <label key={field.name} className={wideField ? "md:col-span-2" : ""}>
                             <span className="mb-2 block text-sm font-semibold text-[color:var(--app-ink)]">
                                 {field.label}
                             </span>
@@ -80,18 +99,10 @@ export function EntityForm({
             </div>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn btn-primary"
-                >
+                <button type="submit" disabled={isSubmitting} className="btn btn-primary">
                     {isSubmitting ? "Salvataggio..." : submitLabel}
                 </button>
-                <button
-                    type="button"
-                    onClick={onCancel}
-                    className="btn btn-neutral"
-                >
+                <button type="button" onClick={onCancel} className="btn btn-neutral">
                     Annulla
                 </button>
             </div>

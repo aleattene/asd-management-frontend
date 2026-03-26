@@ -1,4 +1,5 @@
-import { createCrudService } from "../../shared/api/createCrudService.js";
+import { createCrudService } from "../../shared/api/createCrudService";
+import type { ResourceDefinition, SelectOption } from "../../shared/types/resources";
 
 const athletesService = createCrudService("profiles/athletes");
 const categoriesService = createCrudService("profiles/athletes-categories");
@@ -9,14 +10,14 @@ const sportCertificatesService = createCrudService(
     "documentation/sport-certificates",
 );
 
-function toPersonOption(item) {
+function toPersonOption(item: Record<string, unknown>): SelectOption {
     return {
-        value: item.id,
-        label: `${item.first_name} ${item.last_name}`,
+        value: item.id as string | number,
+        label: `${item.first_name as string} ${item.last_name as string}`,
     };
 }
 
-export const resourceRegistry = [
+export const resourceRegistry: ResourceDefinition[] = [
     {
         key: "athletes",
         path: "athletes",
@@ -69,9 +70,9 @@ export const resourceRegistry = [
         optionLoaders: {
             category: async () => {
                 const items = await categoriesService.list();
-                return items.map((item) => ({
-                    value: item.id,
-                    label: `${item.code} - ${item.description}`,
+                return (items as Record<string, unknown>[]).map((item) => ({
+                    value: item.id as string | number,
+                    label: `${item.code as string} - ${item.description as string}`,
                 }));
             },
         },
@@ -172,7 +173,7 @@ export const resourceRegistry = [
         optionLoaders: {
             trainer: async () => {
                 const items = await trainersService.list();
-                return items.map(toPersonOption);
+                return (items as Record<string, unknown>[]).map(toPersonOption);
             },
         },
     },
@@ -225,11 +226,11 @@ export const resourceRegistry = [
         optionLoaders: {
             sport_doctor: async () => {
                 const items = await sportDoctorsService.list();
-                return items.map(toPersonOption);
+                return (items as Record<string, unknown>[]).map(toPersonOption);
             },
             athlete: async () => {
                 const items = await athletesService.list();
-                return items.map(toPersonOption);
+                return (items as Record<string, unknown>[]).map(toPersonOption);
             },
         },
     },

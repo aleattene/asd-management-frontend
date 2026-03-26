@@ -1,12 +1,13 @@
-import { resourceRegistry } from "../features/resources/resourceRegistry.js";
+import { resourceRegistry } from "../features/resources/resourceRegistry";
+import type { ModuleDefinition } from "../shared/types/resources";
 
-const plannedModules = [
+const plannedModules: ModuleDefinition[] = [
     {
         key: "partnerCompanies",
         section: "Anagrafiche",
-        title: "Società partner",
+        title: "Societa' partner",
         description:
-            "Archivio società convenzionate o partner dell'associazione, con riferimenti e stato collaborazione.",
+            "Archivio societa' convenzionate o partner dell'associazione, con riferimenti e stato collaborazione.",
         status: "planned",
     },
     {
@@ -59,7 +60,7 @@ const plannedModules = [
     },
 ];
 
-const liveModules = resourceRegistry.map((resource) => ({
+const liveModules: ModuleDefinition[] = resourceRegistry.map((resource) => ({
     key: resource.key,
     section: resource.section,
     title: resource.labels.plural,
@@ -71,9 +72,12 @@ const liveModules = resourceRegistry.map((resource) => ({
 
 const allModules = [...liveModules, ...plannedModules];
 
-export const moduleSections = allModules.reduce((sections, module) => {
-    const currentSection = sections[module.section] ?? [];
-    currentSection.push(module);
-    sections[module.section] = currentSection;
-    return sections;
-}, {});
+export const moduleSections = allModules.reduce<Record<string, ModuleDefinition[]>>(
+    (sections, module) => {
+        const currentSection = sections[module.section] ?? [];
+        currentSection.push(module);
+        sections[module.section] = currentSection;
+        return sections;
+    },
+    {},
+);

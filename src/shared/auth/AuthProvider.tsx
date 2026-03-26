@@ -1,4 +1,10 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useMemo,
+    useState,
+    type ReactNode,
+} from "react";
 import {
     apiClient,
     getStoredAccessToken,
@@ -6,12 +12,30 @@ import {
     getStoredUsername,
     setStoredTokens,
     setStoredUsername,
-} from "../api/client.js";
-import { appEnv, getAuthLoginPath } from "../config/env.js";
+} from "../api/client";
+import { appEnv, getAuthLoginPath } from "../config/env";
 
-const AuthContext = createContext(null);
+interface AuthState {
+    accessToken: string;
+    refreshToken: string;
+    username: string;
+}
 
-function readInitialAuth() {
+interface LoginCredentials {
+    username: string;
+    password: string;
+}
+
+interface AuthContextValue {
+    isAuthenticated: boolean;
+    username: string;
+    login: (credentials: LoginCredentials) => Promise<AuthState>;
+    logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+function readInitialAuth(): AuthState {
     if (typeof window === "undefined") {
         return {
             accessToken: "",
@@ -27,10 +51,10 @@ function readInitialAuth() {
     };
 }
 
-export function AuthProvider({ children }) {
-    const [authState, setAuthState] = useState(readInitialAuth);
+export function AuthProvider({ children }: { children: ReactNode }) {
+    const [authState, setAuthState] = useState<AuthState>(readInitialAuth);
 
-    const value = useMemo(
+    const value = useMemo<AuthContextValue>(
         () => ({
             isAuthenticated: Boolean(authState.accessToken),
             username: authState.username,
@@ -39,7 +63,7 @@ export function AuthProvider({ children }) {
                 const password = credentials.password;
 
                 if (appEnv.enableMockAuth) {
-                    const mockSession = {
+                    const mockSession: AuthState = {
                         accessToken: "mock-jwt-access-token",
                         refreshToken: "mock-jwt-refresh-token",
                         username: username || "admin",
@@ -57,7 +81,7 @@ export function AuthProvider({ children }) {
                     password,
                 });
 
-                const session = {
+                const session: AuthState = {
                     accessToken: response.data?.access ?? "",
                     refreshToken: response.data?.refresh ?? "",
                     username,

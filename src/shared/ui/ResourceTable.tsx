@@ -1,11 +1,20 @@
 import { Link } from "react-router-dom";
+import type { ResourceColumnDefinition, ResourceDefinition } from "../types/resources";
 
 const euroCurrencyFormatter = new Intl.NumberFormat("it-IT", {
     style: "currency",
     currency: "EUR",
 });
 
-function formatCellValue(column, value) {
+type ResourceItem = Record<string, unknown> & { id: string | number };
+
+interface ResourceTableProps {
+    resource: ResourceDefinition;
+    items: ResourceItem[];
+    onDelete: (item: ResourceItem) => void;
+}
+
+function formatCellValue(column: ResourceColumnDefinition, value: unknown) {
     if (value === null || value === undefined || value === "") {
         return "—";
     }
@@ -29,20 +38,20 @@ function formatCellValue(column, value) {
         return euroCurrencyFormatter.format(numericValue);
     }
 
-    if (typeof value === "object") {
+    if (typeof value === "object" && value !== null) {
         if ("first_name" in value && "last_name" in value) {
-            return `${value.first_name} ${value.last_name}`;
+            return `${String(value.first_name)} ${String(value.last_name)}`;
         }
 
         if ("description" in value) {
-            return value.description;
+            return String(value.description);
         }
     }
 
     return String(value);
 }
 
-export function ResourceTable({ resource, items, onDelete }) {
+export function ResourceTable({ resource, items, onDelete }: ResourceTableProps) {
     return (
         <div className="overflow-hidden rounded-[1.5rem] border border-[color:var(--app-border)] bg-[color:var(--app-surface-strong)] shadow-[0_14px_40px_rgba(20,36,60,0.08)]">
             <div className="hidden overflow-x-auto lg:block">
@@ -103,9 +112,7 @@ export function ResourceTable({ resource, items, onDelete }) {
                                     key={column.key}
                                     className="flex items-start justify-between gap-4 text-sm"
                                 >
-                                    <span className="font-semibold text-slate-500">
-                                        {column.label}
-                                    </span>
+                                    <span className="font-semibold text-slate-500">{column.label}</span>
                                     <span className="text-right text-slate-800">
                                         {formatCellValue(column, item[column.key])}
                                     </span>
@@ -113,10 +120,7 @@ export function ResourceTable({ resource, items, onDelete }) {
                             ))}
                         </div>
                         <div className="mt-4 flex gap-2">
-                            <Link
-                                to={`/${resource.path}/${item.id}/edit`}
-                                className="btn btn-primary"
-                            >
+                            <Link to={`/${resource.path}/${item.id}/edit`} className="btn btn-primary">
                                 Modifica
                             </Link>
                             <button

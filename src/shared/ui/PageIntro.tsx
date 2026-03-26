@@ -1,4 +1,13 @@
-export function PageIntro({ eyebrow, title, description, action }) {
+import type { ReactNode } from "react";
+
+interface PageIntroProps {
+    eyebrow: string;
+    title: string;
+    description: string;
+    action?: ReactNode;
+}
+
+export function PageIntro({ eyebrow, title, description, action }: PageIntroProps) {
     return (
         <header className="rounded-[1.5rem] border border-[color:var(--app-border)] bg-[color:var(--app-surface-strong)] px-6 py-6 shadow-[0_14px_40px_rgba(20,36,60,0.08)]">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
