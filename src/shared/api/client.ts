@@ -1,5 +1,8 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
-import { getApiBaseUrl } from "../config/env";
+import axios, {
+    type AxiosError,
+    type InternalAxiosRequestConfig,
+} from "axios";
+import { getApiBaseUrl, getAuthRefreshPath } from "../config/env";
 
 export const AUTH_STORAGE_KEYS = {
     accessToken: "asd-management.auth.access-token",
@@ -83,6 +86,68 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 
     return config;
 });
+
+interface RetryableRequestConfig extends InternalAxiosRequestConfig {
+    _retry?: boolean;
+}
+
+interface RefreshResponse {
+    access?: string;
+}
+
+apiClient.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError) => {
+        const originalRequest = error.config as RetryableRequestConfig | undefined;
+
+        if (
+            error.response?.status !== 401 ||
+            !originalRequest ||
+            originalRequest._retry
+        ) {
+            return Promise.reject(error);
+        }
+
+        const refreshToken = getStoredRefreshToken();
+
+        if (!refreshToken) {
+            return Promise.reject(error);
+        }
+
+        originalRequest._retry = true;
+
+        try {
+            const refreshResponse = await axios.post<RefreshResponse>(
+                getAuthRefreshPath(),
+                { refresh: refreshToken },
+                {
+                    baseURL: getApiBaseUrl(),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+
+            const nextAccessToken = refreshResponse.data?.access ?? "";
+
+            if (!nextAccessToken) {
+                throw new Error("JWT refresh response missing access token.");
+            }
+
+            setStoredTokens({
+                accessToken: nextAccessToken,
+                refreshToken,
+            });
+
+            originalRequest.headers.Authorization = `Bearer ${nextAccessToken}`;
+            return apiClient(originalRequest);
+        } catch (refreshError) {
+            setStoredTokens({ accessToken: "", refreshToken: "" });
+            setStoredUsername("");
+            return Promise.reject(refreshError);
+        }
+    },
+);
 
 interface ApiErrorPayload {
     detail?: string;

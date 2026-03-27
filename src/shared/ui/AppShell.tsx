@@ -19,7 +19,9 @@ function PlaceholderModule({ module }: { module: ModuleDefinition }) {
 
 export function AppShell() {
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { logout, firstName, lastName, username, role } = useAuth();
+
+    const displayName = `${firstName} ${lastName}`.trim() || username || "Utente";
 
     function handleLogout() {
         logout();
@@ -44,6 +46,16 @@ export function AppShell() {
                     </NavLink>
 
                     <nav className="mt-8 space-y-6">
+                        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-slate-200">
+                            <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                                Profilo
+                            </p>
+                            <p className="mt-2 font-medium text-white">{displayName}</p>
+                            <p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-300">
+                                {role || "Utente autenticato"}
+                            </p>
+                        </div>
+
                         <div>
                             <p className="mb-2 text-xs uppercase tracking-[0.3em] text-slate-400">
                                 Overview

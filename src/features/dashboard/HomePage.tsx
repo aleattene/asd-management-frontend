@@ -6,7 +6,13 @@ import { useAuth } from "../../shared/auth/AuthProvider";
 import { appEnv } from "../../shared/config/env";
 import type { ModuleDefinition } from "../../shared/types/resources";
 
-function formatDisplayName(username: string) {
+function formatDisplayName(firstName: string, lastName: string, username: string) {
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    if (fullName) {
+        return fullName;
+    }
+
     if (!username) {
         return "Utente";
     }
@@ -159,9 +165,9 @@ function LoginPage() {
 }
 
 function DashboardPage() {
-    const { username } = useAuth();
+    const { username, firstName, lastName, role } = useAuth();
     const modules = Object.values(moduleSections).flat() as ModuleDefinition[];
-    const displayName = formatDisplayName(username);
+    const displayName = formatDisplayName(firstName, lastName, username);
     const initials = getInitials(displayName);
 
     return (
@@ -183,7 +189,7 @@ function DashboardPage() {
                                 {displayName}
                             </p>
                             <p className="text-sm text-[color:var(--app-muted)]">
-                                Accesso alla piattaforma gestionale
+                                {role ? `Ruolo: ${role}` : "Accesso alla piattaforma gestionale"}
                             </p>
                         </div>
                     </div>
