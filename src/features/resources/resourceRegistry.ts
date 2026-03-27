@@ -11,6 +11,7 @@ const countriesService = createCrudService("countries");
 const enrollmentsService = createCrudService("enrollments");
 const invoicesService = createCrudService("invoices");
 const paymentMethodsService = createCrudService("payment-methods");
+const receiptsService = createCrudService("receipts");
 const paymentsService = createCrudService("payments/payments");
 const sportCertificatesService = createCrudService("certificates");
 
@@ -402,6 +403,87 @@ export const resourceRegistry: ResourceDefinition[] = [
                     value: item.id as string | number,
                     label: item.business_name as string,
                 }));
+            },
+            payment_method: async () => {
+                const items = await paymentMethodsService.list();
+                return (items as Record<string, unknown>[]).map((item) => ({
+                    value: item.id as string | number,
+                    label: item.name as string,
+                }));
+            },
+            is_active: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
+        },
+    },
+    {
+        key: "receipts",
+        path: "receipts",
+        section: "Amministrazione",
+        labels: {
+            singular: "ricevuta",
+            plural: "Ricevute",
+        },
+        description:
+            "Ricevute con utente associato, metodo di pagamento, importo e stato attivo.",
+        service: receiptsService,
+        columns: [
+            { key: "date", label: "Data", type: "date" },
+            { key: "user", label: "Utente" },
+            { key: "description", label: "Descrizione" },
+            { key: "amount", label: "Importo", type: "currency" },
+            { key: "is_active", label: "Attiva" },
+        ],
+        fields: [
+            {
+                name: "date",
+                label: "Data ricevuta",
+                type: "date",
+                required: true,
+            },
+            {
+                name: "description",
+                label: "Descrizione",
+                type: "textarea",
+                required: true,
+                maxLength: 200,
+            },
+            {
+                name: "amount",
+                label: "Importo",
+                type: "text",
+                required: true,
+                placeholder: "0.00",
+            },
+            {
+                name: "user",
+                label: "Utente",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona utente",
+            },
+            {
+                name: "payment_method",
+                label: "Metodo di pagamento",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona metodo",
+            },
+            {
+                name: "is_active",
+                label: "Ricevuta attiva",
+                type: "select",
+                required: true,
+                defaultValue: true,
+                valueType: "boolean",
+                placeholder: "Seleziona stato",
+            },
+        ],
+        optionLoaders: {
+            user: async () => {
+                const items = await usersService.list();
+                return (items as Record<string, unknown>[]).map(toUserOption);
             },
             payment_method: async () => {
                 const items = await paymentMethodsService.list();

@@ -11,14 +11,6 @@ const plannedModules: ModuleDefinition[] = [
         status: "planned",
     },
     {
-        key: "receipts",
-        section: "Amministrazione",
-        title: "Ricevute",
-        description:
-            "Ricevute di acquisto e vendita, con classificazione per tipologia e controparte.",
-        status: "planned",
-    },
-    {
         key: "documentGeneration",
         section: "Generazione documenti",
         title: "Generazione documenti",
