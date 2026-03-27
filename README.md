@@ -1,103 +1,86 @@
 # ASD Management Frontend
 
-Frontend React/Vite per la gestione di un'associazione sportiva.
-
 [![Netlify Status](https://api.netlify.com/api/v1/badges/8d5c1b60-cbc3-4e95-8602-30949fbc942d/deploy-status)](https://app.netlify.com/sites/asd-management/deploys)
 [![codecov](https://codecov.io/gh/aleattene/asd-management-frontend/branch/main/graph/badge.svg?token=TBZQE4DBR3)](https://codecov.io/gh/aleattene/asd-management-frontend)
 
-Deploy: https://asd-management.netlify.app/
+https://asd-management.netlify.app/
 
-Il progetto si concentra attualmente su:
-- accesso riservato con login interno
-- struttura modulare per CRUD amministrativi e documentali
-- sidebar e dashboard gia' predisposte anche per moduli futuri
+## Moduli implementati
 
-## Stack
-
-- React 19
-- Vite 6
-- React Router 7
-- Axios
-- Tailwind CSS 4
-
-## Stato attuale
-
-Moduli attivi:
 - Atleti
 - Allenatori
 - Medici sportivi
-- Compensi
-- Certificati medici
-
-Moduli pianificati / placeholder:
 - Societa' partner
 - Iscrizioni atleti
-- Movimenti finanziari
 - Fatture
 - Ricevute
+- Certificati medici
+
+#### Moduli pianificati o in standby:
+
+- Movimenti finanziari
 - Generazione documenti
 - Bandi regionali
 
-## Struttura del progetto
+## Stack tecnologico:
 
-La struttura e' organizzata per responsabilita':
+- React 19
+- TypeScript
+- Vite 7
+- React Router 7
+- Axios
+- Tailwind CSS 4
+- ESLint 9
 
-- `src/app/` configurazione applicativa e catalogo moduli
-- `src/features/` funzionalita' di dominio
-- `src/shared/` componenti, config e utility condivise
+## Requisiti locali
 
-File principali:
-- `src/app/router.jsx`
-- `src/app/moduleCatalog.js`
-- `src/features/resources/resourceRegistry.js`
-- `src/shared/config/env.js`
-
-## Avvio locale
-
-Prerequisiti:
-- Node.js 20+ consigliato
+- Node.js `>= 22.18.0`
 - npm
 
-Installazione:
+Versione consigliata per sviluppo locale:
+- Node 24 (`.nvmrc`)
 
-```bash
-npm install
-```
-
-Avvio in sviluppo:
+## Script disponibili
 
 ```bash
 npm run dev
-```
-
-Build produzione:
-
-```bash
 npm run build
-```
-
-Preview build:
-
-```bash
 npm run preview
-```
-
-Lint:
-
-```bash
 npm run lint
+npm run typecheck
+npm test
 ```
+
+Nota:
+- `npm test` e' ancora un placeholder
+- i controlli reali oggi sono `lint`, `typecheck` e `build`
+
+## Struttura del progetto
+
+- `src/app/` bootstrap applicativo, router e catalogo moduli
+- `src/features/` pagine e logica per dominio
+- `src/shared/` API client, auth, config, tipi e componenti riusabili
+
+File centrali:
+- `src/app/router.tsx`
+- `src/app/moduleCatalog.ts`
+- `src/features/resources/resourceRegistry.ts`
+- `src/shared/api/client.ts`
+- `src/shared/api/createCrudService.ts`
+- `src/shared/auth/AuthProvider.tsx`
+- `src/shared/config/env.ts`
 
 ## Configurazione ambiente
 
-Copia `.env.example` in `.env` e valorizza le variabili necessarie.
+Copia `.env.example` in `.env` e valorizza solo variabili non sensibili lato frontend.
 
-Variabili disponibili:
+Variabili attualmente supportate:
 
 ```dotenv
 VITE_API_BASE_URL=
 VITE_ENABLE_MOCK_AUTH=false
 VITE_AUTH_LOGIN_PATH=
+VITE_AUTH_REFRESH_PATH=
 
 VITE_APP_NAME=ASD Management
 VITE_ASSOCIATION_NAME=
@@ -105,47 +88,45 @@ VITE_APP_TAGLINE=
 VITE_SUPPORT_EMAIL=
 ```
 
-Note:
-- `VITE_ENABLE_MOCK_AUTH=true` abilita un login fittizio utile per sviluppo/demo
-- `VITE_API_BASE_URL` e `VITE_AUTH_LOGIN_PATH` sono richieste per usare il backend JWT reale
-- le variabili `VITE_*` sono pubbliche lato frontend: non inserire segreti
+Linee guida:
+- non inserire segreti, token, password o chiavi private
+- le variabili `VITE_*` sono esposte al bundle frontend
+- usare dati di branding e configurazione pubblica, non dati riservati
 
 ## Autenticazione
 
-Il frontend e' predisposto per autenticazione JWT.
+Il frontend supporta due modalita':
 
-Comportamento attuale:
-- in ambiente demo/sviluppo puoi usare `VITE_ENABLE_MOCK_AUTH=true`
-- con backend reale il login usa l'endpoint configurato in `VITE_AUTH_LOGIN_PATH`
+- mock auth, solo se `VITE_ENABLE_MOCK_AUTH=true`
+- JWT reale con backend Django/DRF
 
-Le route applicative sono protette e accessibili solo dopo login.
+Per il backend reale servono almeno:
 
-## UI e branding
-
-Il branding base dell'interfaccia e' configurabile via env:
-- nome applicazione
-- nome associazione
-- tagline
-- email supporto
-
-La favicon e' gestita nella cartella `public/`.
-
-## Testing
-
-Al momento non sono presenti test automatici reali.
-
-Lo script corrente:
-
-```bash
-npm test
+```dotenv
+VITE_API_BASE_URL=http://localhost:8000/api/v1
+VITE_AUTH_LOGIN_PATH=auth/token
+VITE_AUTH_REFRESH_PATH=auth/token/refresh
+VITE_ENABLE_MOCK_AUTH=false
 ```
 
-restituisce solo un placeholder. La pipeline CI esegue comunque installazione, build e test script corrente.
+Il profilo autenticato viene recuperato tramite `users/me`.
 
-## Roadmap breve
+## Convenzioni API
 
-- collegamento completo al backend Django/DRF
-- introduzione ruoli utente reali
-- attivazione dei moduli placeholder
-- aggiunta test frontend reali
-- generazione documenti e gestione bandi
+- `VITE_API_BASE_URL` deve puntare alla base API, ad esempio `.../api/v1`
+- i path delle risorse nel frontend sono relativi a quella base
+- le liste backend paginate vengono gia' normalizzate dal service layer
+
+## Qualita' del codice
+
+Controlli attuali:
+- ESLint
+- TypeScript typecheck
+- build Vite
+
+## Prossime Feature e miglioramenti:
+
+- collegamento del frontend a backend dev con seed data
+- verifica manuale dei moduli reali contro API non produttive
+- valutazione eventuale di MSW per sviluppo isolato e test
+- miglioramento UI per filtri, ricerca e paginazione
