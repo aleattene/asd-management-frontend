@@ -1,12 +1,12 @@
 # ASD Management Frontend
 
-Frontend React/Vite per la gestione interna di una associazione sportiva.
+[![Netlify Status](https://api.netlify.com/api/v1/badges/8d5c1b60-cbc3-4e95-8602-30949fbc942d/deploy-status)](https://app.netlify.com/sites/asd-management/deploys)
+[![codecov](https://codecov.io/gh/aleattene/asd-management-frontend/branch/main/graph/badge.svg?token=TBZQE4DBR3)](https://codecov.io/gh/aleattene/asd-management-frontend)
 
-Il progetto e' strutturato per lavorare con backend Django/DRF, autenticazione JWT e moduli CRUD organizzati per dominio.
+https://asd-management.netlify.app/
 
-## Stato attuale
+## Moduli implementati
 
-Moduli attivi:
 - Atleti
 - Allenatori
 - Medici sportivi
@@ -16,12 +16,13 @@ Moduli attivi:
 - Ricevute
 - Certificati medici
 
-Moduli pianificati o in standby:
+#### Moduli pianificati o in standby:
+
 - Movimenti finanziari
 - Generazione documenti
 - Bandi regionali
 
-## Stack
+## Stack tecnologico:
 
 - React 19
 - TypeScript
@@ -123,11 +124,8 @@ Controlli attuali:
 - TypeScript typecheck
 - build Vite
 
-Non sono ancora presenti test frontend automatici reali.
+## Prossime Feature e miglioramenti:
 
-## Roadmap sintetica
-
-Prossimi passi previsti:
 - collegamento del frontend a backend dev con seed data
 - verifica manuale dei moduli reali contro API non produttive
 - valutazione eventuale di MSW per sviluppo isolato e test
