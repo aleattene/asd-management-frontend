@@ -3,35 +3,11 @@ import type { ModuleDefinition } from "../shared/types/resources";
 
 const plannedModules: ModuleDefinition[] = [
     {
-        key: "athleteEnrollments",
-        section: "Documentazione",
-        title: "Iscrizioni atleti",
-        description:
-            "Pratiche di iscrizione con stagione sportiva, quota, allegati e stato amministrativo.",
-        status: "planned",
-    },
-    {
         key: "financialMovements",
         section: "Amministrazione",
         title: "Movimenti finanziari",
         description:
             "Entrate e uscite dell'associazione con causale, data competenza e riconciliazione.",
-        status: "planned",
-    },
-    {
-        key: "invoices",
-        section: "Amministrazione",
-        title: "Fatture",
-        description:
-            "Fatture di acquisto e vendita gestite in un unico modulo con tipologia documento.",
-        status: "planned",
-    },
-    {
-        key: "receipts",
-        section: "Amministrazione",
-        title: "Ricevute",
-        description:
-            "Ricevute di acquisto e vendita, con classificazione per tipologia e controparte.",
         status: "planned",
     },
     {

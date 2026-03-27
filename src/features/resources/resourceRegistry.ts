@@ -8,7 +8,10 @@ const trainersService = createCrudService("trainers");
 const sportDoctorsService = createCrudService("doctors");
 const partnerCompaniesService = createCrudService("companies");
 const countriesService = createCrudService("countries");
-const paymentsService = createCrudService("payments/payments");
+const enrollmentsService = createCrudService("enrollments");
+const invoicesService = createCrudService("invoices");
+const paymentMethodsService = createCrudService("payment-methods");
+const receiptsService = createCrudService("receipts");
 const sportCertificatesService = createCrudService("certificates");
 
 function toPersonOption(item: Record<string, unknown>): SelectOption {
@@ -263,14 +266,12 @@ export const resourceRegistry: ResourceDefinition[] = [
                 name: "vat_number",
                 label: "Partita IVA",
                 type: "text",
-                required: true,
                 maxLength: 11,
             },
             {
                 name: "fiscal_code",
                 label: "Codice fiscale",
                 type: "text",
-                required: true,
                 maxLength: 16,
                 copyFrom: "vat_number",
                 copyWhen: {
@@ -313,43 +314,187 @@ export const resourceRegistry: ResourceDefinition[] = [
         },
     },
     {
-        key: "payments",
-        path: "payments",
+        key: "invoices",
+        path: "invoices",
         section: "Amministrazione",
         labels: {
-            singular: "compenso",
-            plural: "Compensi",
+            singular: "fattura",
+            plural: "Fatture",
         },
         description:
-            "Compensi trainer con data pagamento, importo e collegamento al tecnico.",
-        service: paymentsService,
+            "Fatture di acquisto e vendita con azienda, metodo di pagamento, importo e stato attivo.",
+        service: invoicesService,
         columns: [
-            { key: "id", label: "ID" },
-            { key: "payment_date", label: "Data pagamento", type: "date" },
+            { key: "date", label: "Data", type: "date" },
+            { key: "number", label: "Numero" },
+            { key: "direction", label: "Tipo" },
+            { key: "company", label: "Societa'" },
             { key: "amount", label: "Importo", type: "currency" },
-            { key: "trainer", label: "Allenatore" },
+            { key: "is_active", label: "Attiva" },
         ],
         fields: [
             {
-                name: "payment_date",
-                label: "Data di pagamento",
+                name: "date",
+                label: "Data fattura",
                 type: "date",
                 required: true,
             },
-            { name: "amount", label: "Importo", type: "number", required: true },
             {
-                name: "trainer",
-                label: "Allenatore",
+                name: "number",
+                label: "Numero fattura",
+                type: "text",
+                required: true,
+                maxLength: 25,
+            },
+            {
+                name: "description",
+                label: "Descrizione",
+                type: "textarea",
+                required: true,
+                maxLength: 200,
+            },
+            {
+                name: "amount",
+                label: "Importo",
+                type: "text",
+                required: true,
+                placeholder: "0.00",
+            },
+            {
+                name: "direction",
+                label: "Tipo",
                 type: "select",
                 required: true,
-                placeholder: "Seleziona allenatore",
+                placeholder: "Seleziona tipo",
+            },
+            {
+                name: "company",
+                label: "Societa'",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona societa'",
+            },
+            {
+                name: "payment_method",
+                label: "Metodo di pagamento",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona metodo",
+            },
+            {
+                name: "is_active",
+                label: "Fattura attiva",
+                type: "select",
+                required: true,
+                defaultValue: true,
+                valueType: "boolean",
+                placeholder: "Seleziona stato",
             },
         ],
         optionLoaders: {
-            trainer: async () => {
-                const items = await trainersService.list();
-                return (items as Record<string, unknown>[]).map(toPersonOption);
+            direction: async () => [
+                { value: "purchase", label: "Acquisto" },
+                { value: "sale", label: "Vendita" },
+            ],
+            company: async () => {
+                const items = await partnerCompaniesService.list();
+                return (items as Record<string, unknown>[]).map((item) => ({
+                    value: item.id as string | number,
+                    label: item.business_name as string,
+                }));
             },
+            payment_method: async () => {
+                const items = await paymentMethodsService.list();
+                return (items as Record<string, unknown>[]).map((item) => ({
+                    value: item.id as string | number,
+                    label: item.name as string,
+                }));
+            },
+            is_active: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
+        },
+    },
+    {
+        key: "receipts",
+        path: "receipts",
+        section: "Amministrazione",
+        labels: {
+            singular: "ricevuta",
+            plural: "Ricevute",
+        },
+        description:
+            "Ricevute con utente associato, metodo di pagamento, importo e stato attivo.",
+        service: receiptsService,
+        columns: [
+            { key: "date", label: "Data", type: "date" },
+            { key: "user", label: "Utente" },
+            { key: "description", label: "Descrizione" },
+            { key: "amount", label: "Importo", type: "currency" },
+            { key: "is_active", label: "Attiva" },
+        ],
+        fields: [
+            {
+                name: "date",
+                label: "Data ricevuta",
+                type: "date",
+                required: true,
+            },
+            {
+                name: "description",
+                label: "Descrizione",
+                type: "textarea",
+                required: true,
+                maxLength: 200,
+            },
+            {
+                name: "amount",
+                label: "Importo",
+                type: "text",
+                required: true,
+                placeholder: "0.00",
+            },
+            {
+                name: "user",
+                label: "Utente",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona utente",
+            },
+            {
+                name: "payment_method",
+                label: "Metodo di pagamento",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona metodo",
+            },
+            {
+                name: "is_active",
+                label: "Ricevuta attiva",
+                type: "select",
+                required: true,
+                defaultValue: true,
+                valueType: "boolean",
+                placeholder: "Seleziona stato",
+            },
+        ],
+        optionLoaders: {
+            user: async () => {
+                const items = await usersService.list();
+                return (items as Record<string, unknown>[]).map(toUserOption);
+            },
+            payment_method: async () => {
+                const items = await paymentMethodsService.list();
+                return (items as Record<string, unknown>[]).map((item) => ({
+                    value: item.id as string | number,
+                    label: item.name as string,
+                }));
+            },
+            is_active: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
         },
     },
     {
