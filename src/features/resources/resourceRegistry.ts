@@ -263,14 +263,12 @@ export const resourceRegistry: ResourceDefinition[] = [
                 name: "vat_number",
                 label: "Partita IVA",
                 type: "text",
-                required: true,
                 maxLength: 11,
             },
             {
                 name: "fiscal_code",
                 label: "Codice fiscale",
                 type: "text",
-                required: true,
                 maxLength: 16,
                 copyFrom: "vat_number",
                 copyWhen: {
