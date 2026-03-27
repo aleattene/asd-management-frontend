@@ -1,15 +1,13 @@
 import { createCrudService } from "../../shared/api/createCrudService";
 import type { ResourceDefinition, SelectOption } from "../../shared/types/resources";
 
-const athletesService = createCrudService("profiles/athletes");
-const categoriesService = createCrudService("profiles/athletes-categories");
-const trainersService = createCrudService("profiles/trainers");
-const sportDoctorsService = createCrudService("profiles/sport-doctors");
-const partnerCompaniesService = createCrudService("customers/companies");
+const athletesService = createCrudService("/api/v1/athletes");
+const categoriesService = createCrudService("/api/v1/categories");
+const trainersService = createCrudService("/api/v1/trainers");
+const sportDoctorsService = createCrudService("/api/v1/doctors");
+const partnerCompaniesService = createCrudService("/api/v1/companies");
 const paymentsService = createCrudService("payments/payments");
-const sportCertificatesService = createCrudService(
-    "documentation/sport-certificates",
-);
+const sportCertificatesService = createCrudService("/api/v1/certificates");
 
 function toPersonOption(item: Record<string, unknown>): SelectOption {
     return {
@@ -59,15 +57,6 @@ export const resourceRegistry: ResourceDefinition[] = [
                 type: "text",
                 required: true,
                 maxLength: 16,
-                copyFrom: "vat_number",
-                copyWhen: {
-                    field: "vat_equals_fc",
-                    value: true,
-                },
-                readOnlyWhen: {
-                    field: "vat_equals_fc",
-                    value: true,
-                },
             },
             {
                 name: "category",
@@ -113,15 +102,6 @@ export const resourceRegistry: ResourceDefinition[] = [
                 type: "text",
                 required: true,
                 maxLength: 16,
-                copyFrom: "vat_number",
-                copyWhen: {
-                    field: "vat_equals_fc",
-                    value: true,
-                },
-                readOnlyWhen: {
-                    field: "vat_equals_fc",
-                    value: true,
-                },
             },
         ],
         optionLoaders: {},
