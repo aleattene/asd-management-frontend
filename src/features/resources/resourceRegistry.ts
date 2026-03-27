@@ -9,6 +9,8 @@ const sportDoctorsService = createCrudService("doctors");
 const partnerCompaniesService = createCrudService("companies");
 const countriesService = createCrudService("countries");
 const enrollmentsService = createCrudService("enrollments");
+const invoicesService = createCrudService("invoices");
+const paymentMethodsService = createCrudService("payment-methods");
 const paymentsService = createCrudService("payments/payments");
 const sportCertificatesService = createCrudService("certificates");
 
@@ -305,6 +307,109 @@ export const resourceRegistry: ResourceDefinition[] = [
                 { value: "true", label: "Si" },
                 { value: "false", label: "No" },
             ],
+            is_active: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
+        },
+    },
+    {
+        key: "invoices",
+        path: "invoices",
+        section: "Amministrazione",
+        labels: {
+            singular: "fattura",
+            plural: "Fatture",
+        },
+        description:
+            "Fatture di acquisto e vendita con azienda, metodo di pagamento, importo e stato attivo.",
+        service: invoicesService,
+        columns: [
+            { key: "date", label: "Data", type: "date" },
+            { key: "number", label: "Numero" },
+            { key: "direction", label: "Tipo" },
+            { key: "company", label: "Societa'" },
+            { key: "amount", label: "Importo", type: "currency" },
+            { key: "is_active", label: "Attiva" },
+        ],
+        fields: [
+            {
+                name: "date",
+                label: "Data fattura",
+                type: "date",
+                required: true,
+            },
+            {
+                name: "number",
+                label: "Numero fattura",
+                type: "text",
+                required: true,
+                maxLength: 25,
+            },
+            {
+                name: "description",
+                label: "Descrizione",
+                type: "textarea",
+                required: true,
+                maxLength: 200,
+            },
+            {
+                name: "amount",
+                label: "Importo",
+                type: "text",
+                required: true,
+                placeholder: "0.00",
+            },
+            {
+                name: "direction",
+                label: "Tipo",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona tipo",
+            },
+            {
+                name: "company",
+                label: "Societa'",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona societa'",
+            },
+            {
+                name: "payment_method",
+                label: "Metodo di pagamento",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona metodo",
+            },
+            {
+                name: "is_active",
+                label: "Fattura attiva",
+                type: "select",
+                required: true,
+                defaultValue: true,
+                valueType: "boolean",
+                placeholder: "Seleziona stato",
+            },
+        ],
+        optionLoaders: {
+            direction: async () => [
+                { value: "purchase", label: "Acquisto" },
+                { value: "sale", label: "Vendita" },
+            ],
+            company: async () => {
+                const items = await partnerCompaniesService.list();
+                return (items as Record<string, unknown>[]).map((item) => ({
+                    value: item.id as string | number,
+                    label: item.business_name as string,
+                }));
+            },
+            payment_method: async () => {
+                const items = await paymentMethodsService.list();
+                return (items as Record<string, unknown>[]).map((item) => ({
+                    value: item.id as string | number,
+                    label: item.name as string,
+                }));
+            },
             is_active: async () => [
                 { value: "true", label: "Si" },
                 { value: "false", label: "No" },

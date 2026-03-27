@@ -11,14 +11,6 @@ const plannedModules: ModuleDefinition[] = [
         status: "planned",
     },
     {
-        key: "invoices",
-        section: "Amministrazione",
-        title: "Fatture",
-        description:
-            "Fatture di acquisto e vendita gestite in un unico modulo con tipologia documento.",
-        status: "planned",
-    },
-    {
         key: "receipts",
         section: "Amministrazione",
         title: "Ricevute",
