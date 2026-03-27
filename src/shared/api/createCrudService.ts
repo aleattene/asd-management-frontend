@@ -8,13 +8,33 @@ function normalizePath(path: string) {
         .join("/");
 }
 
+interface PaginatedListResponse {
+    results?: unknown;
+}
+
+function unwrapListResponse(data: unknown) {
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+    if (
+        typeof data === "object" &&
+        data !== null &&
+        Array.isArray((data as PaginatedListResponse).results)
+    ) {
+        return (data as PaginatedListResponse).results;
+    }
+
+    return [];
+}
+
 export function createCrudService(path: string): CrudService {
     const resourcePath = `${normalizePath(path)}/`;
 
     return {
         list: async () => {
             const response = await apiClient.get(resourcePath);
-            return response.data;
+            return unwrapListResponse(response.data);
         },
         getById: async (id) => {
             const response = await apiClient.get(`${resourcePath}${id}/`);
