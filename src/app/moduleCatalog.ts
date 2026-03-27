@@ -3,14 +3,6 @@ import type { ModuleDefinition } from "../shared/types/resources";
 
 const plannedModules: ModuleDefinition[] = [
     {
-        key: "partnerCompanies",
-        section: "Anagrafiche",
-        title: "Societa' partner",
-        description:
-            "Archivio societa' convenzionate o partner dell'associazione, con riferimenti e stato collaborazione.",
-        status: "planned",
-    },
-    {
         key: "athleteEnrollments",
         section: "Documentazione",
         title: "Iscrizioni atleti",

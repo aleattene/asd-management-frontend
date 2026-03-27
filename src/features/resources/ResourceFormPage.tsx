@@ -9,9 +9,21 @@ import type { ResourceDefinition, SelectOption } from "../../shared/types/resour
 type FormValues = Record<string, string | number>;
 type FormRecord = Record<string, unknown>;
 
+function normalizeComparableValue(value: string | number | boolean) {
+    return typeof value === "boolean" ? String(value) : value;
+}
+
 function buildInitialValues(resource: ResourceDefinition): FormValues {
     return resource.fields.reduce<FormValues>((values, field) => {
-        values[field.name] = "";
+        if (field.defaultValue === undefined) {
+            values[field.name] = "";
+            return values;
+        }
+
+        values[field.name] =
+            typeof field.defaultValue === "boolean"
+                ? String(field.defaultValue)
+                : field.defaultValue;
         return values;
     }, {});
 }
@@ -19,20 +31,62 @@ function buildInitialValues(resource: ResourceDefinition): FormValues {
 function normalizeRecord(resource: ResourceDefinition, record: FormRecord): FormValues {
     return resource.fields.reduce<FormValues>((values, field) => {
         const fieldValue = record?.[field.name];
-        values[field.name] =
-            field.type === "select" && typeof fieldValue === "object" && fieldValue !== null
-                ? (((fieldValue as { id?: string | number }).id ?? "") as string | number)
-                : ((fieldValue ?? "") as string | number);
+
+        if (field.valueType === "boolean" && typeof fieldValue === "boolean") {
+            values[field.name] = String(fieldValue);
+            return values;
+        }
+
+        values[field.name] = field.type === "select" && typeof fieldValue === "object" && fieldValue !== null
+            ? (((fieldValue as { id?: string | number }).id ?? "") as string | number)
+            : ((fieldValue ?? "") as string | number);
         return values;
     }, {});
 }
 
 function buildSubmitPayload(resource: ResourceDefinition, values: FormValues) {
-    return resource.fields.reduce<Record<string, string | number>>((payload, field) => {
+    return resource.fields.reduce<Record<string, string | number | boolean>>((payload, field) => {
         const fieldValue = values[field.name];
-        payload[field.name] = field.type === "number" && fieldValue !== "" ? Number(fieldValue) : fieldValue;
+
+        if (field.valueType === "boolean") {
+            payload[field.name] = fieldValue === "true";
+            return payload;
+        }
+
+        payload[field.name] =
+            field.type === "number" && fieldValue !== "" ? Number(fieldValue) : fieldValue;
         return payload;
     }, {});
+}
+
+function applyDependentFieldRules(
+    resource: ResourceDefinition,
+    currentValues: FormValues,
+    changedFieldName: string,
+    changedValue: string,
+) {
+    const nextValues = {
+        ...currentValues,
+        [changedFieldName]: changedValue,
+    };
+
+    resource.fields.forEach((field) => {
+        if (!field.copyFrom || !field.copyWhen) {
+            return;
+        }
+
+        const triggerValue = nextValues[field.copyWhen.field];
+        const expectedValue = normalizeComparableValue(field.copyWhen.value);
+
+        if (
+            triggerValue === expectedValue &&
+            (changedFieldName === field.copyWhen.field || changedFieldName === field.copyFrom)
+        ) {
+            nextValues[field.name] = nextValues[field.copyFrom];
+        }
+    });
+
+    return nextValues;
 }
 
 interface ResourceFormPageProps {
@@ -136,10 +190,7 @@ export function ResourceFormPage({ resource, mode }: ResourceFormPageProps) {
 
     function handleChange(event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
         const { name, value } = event.target;
-        setFormValues((currentValues) => ({
-            ...currentValues,
-            [name]: value,
-        }));
+        setFormValues((currentValues) => applyDependentFieldRules(resource, currentValues, name, value));
     }
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {

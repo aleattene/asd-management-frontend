@@ -13,6 +13,17 @@ export interface ResourceFieldDefinition {
     required?: boolean;
     maxLength?: number;
     placeholder?: string;
+    defaultValue?: string | number | boolean;
+    valueType?: "boolean";
+    copyFrom?: string;
+    copyWhen?: {
+        field: string;
+        value: string | number | boolean;
+    };
+    readOnlyWhen?: {
+        field: string;
+        value: string | number | boolean;
+    };
 }
 
 export interface SelectOption {
