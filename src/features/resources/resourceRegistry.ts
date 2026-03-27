@@ -8,6 +8,7 @@ const trainersService = createCrudService("trainers");
 const sportDoctorsService = createCrudService("doctors");
 const partnerCompaniesService = createCrudService("companies");
 const countriesService = createCrudService("countries");
+const enrollmentsService = createCrudService("enrollments");
 const paymentsService = createCrudService("payments/payments");
 const sportCertificatesService = createCrudService("certificates");
 
@@ -348,6 +349,79 @@ export const resourceRegistry: ResourceDefinition[] = [
                 const items = await trainersService.list();
                 return (items as Record<string, unknown>[]).map(toPersonOption);
             },
+        },
+    },
+    {
+        key: "athleteEnrollments",
+        path: "enrollments",
+        section: "Documentazione",
+        labels: {
+            singular: "iscrizione atleta",
+            plural: "Iscrizioni atleti",
+        },
+        description:
+            "Pratiche di iscrizione con atleta, stagione sportiva, data registrazione e stato attivo.",
+        service: enrollmentsService,
+        columns: [
+            { key: "athlete", label: "Atleta" },
+            { key: "season", label: "Stagione" },
+            { key: "enrollment_date", label: "Data iscrizione", type: "date" },
+            { key: "guardian_signed", label: "Firma tutore" },
+            { key: "is_active", label: "Attiva" },
+        ],
+        fields: [
+            {
+                name: "athlete",
+                label: "Atleta",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona atleta",
+            },
+            {
+                name: "season",
+                label: "Stagione sportiva",
+                type: "text",
+                required: true,
+                placeholder: "2026/2027",
+            },
+            {
+                name: "enrollment_date",
+                label: "Data iscrizione",
+                type: "date",
+                required: true,
+            },
+            {
+                name: "guardian_signed",
+                label: "Firma tutore presente",
+                type: "select",
+                required: true,
+                defaultValue: false,
+                valueType: "boolean",
+                placeholder: "Seleziona opzione",
+            },
+            {
+                name: "is_active",
+                label: "Iscrizione attiva",
+                type: "select",
+                required: true,
+                defaultValue: true,
+                valueType: "boolean",
+                placeholder: "Seleziona stato",
+            },
+        ],
+        optionLoaders: {
+            athlete: async () => {
+                const items = await athletesService.list();
+                return (items as Record<string, unknown>[]).map(toPersonOption);
+            },
+            guardian_signed: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
+            is_active: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
         },
     },
     {

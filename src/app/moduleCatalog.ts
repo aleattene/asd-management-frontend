@@ -3,14 +3,6 @@ import type { ModuleDefinition } from "../shared/types/resources";
 
 const plannedModules: ModuleDefinition[] = [
     {
-        key: "athleteEnrollments",
-        section: "Documentazione",
-        title: "Iscrizioni atleti",
-        description:
-            "Pratiche di iscrizione con stagione sportiva, quota, allegati e stato amministrativo.",
-        status: "planned",
-    },
-    {
         key: "financialMovements",
         section: "Amministrazione",
         title: "Movimenti finanziari",
