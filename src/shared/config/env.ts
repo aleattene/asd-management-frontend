@@ -13,6 +13,7 @@ export interface AppEnv {
     applicationName: string;
     apiBaseUrl: string;
     authLoginPath: string;
+    authRefreshPath: string;
     enableMockAuth: boolean;
     associationName: string;
     appTagline: string;
@@ -26,6 +27,9 @@ export const appEnv: AppEnv = {
         : "",
     authLoginPath: import.meta.env.VITE_AUTH_LOGIN_PATH?.trim()
         ? normalizePath(import.meta.env.VITE_AUTH_LOGIN_PATH.trim())
+        : "",
+    authRefreshPath: import.meta.env.VITE_AUTH_REFRESH_PATH?.trim()
+        ? normalizePath(import.meta.env.VITE_AUTH_REFRESH_PATH.trim())
         : "",
     enableMockAuth: import.meta.env.VITE_ENABLE_MOCK_AUTH === "true",
     associationName: import.meta.env.VITE_ASSOCIATION_NAME?.trim() || "ASD Name",
@@ -53,5 +57,15 @@ export function getAuthLoginPath() {
 
     throw new Error(
         "Missing VITE_AUTH_LOGIN_PATH. Configure it in the environment before calling the JWT login endpoint.",
+    );
+}
+
+export function getAuthRefreshPath() {
+    if (appEnv.authRefreshPath) {
+        return appEnv.authRefreshPath;
+    }
+
+    throw new Error(
+        "Missing VITE_AUTH_REFRESH_PATH. Configure it in the environment before calling the JWT refresh endpoint.",
     );
 }

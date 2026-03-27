@@ -1,5 +1,6 @@
 import {
     createContext,
+    useEffect,
     useContext,
     useMemo,
     useState,
@@ -19,6 +20,9 @@ interface AuthState {
     accessToken: string;
     refreshToken: string;
     username: string;
+    firstName: string;
+    lastName: string;
+    role: string;
 }
 
 interface LoginCredentials {
@@ -29,6 +33,9 @@ interface LoginCredentials {
 interface AuthContextValue {
     isAuthenticated: boolean;
     username: string;
+    firstName: string;
+    lastName: string;
+    role: string;
     login: (credentials: LoginCredentials) => Promise<AuthState>;
     logout: () => void;
 }
@@ -41,6 +48,9 @@ function readInitialAuth(): AuthState {
             accessToken: "",
             refreshToken: "",
             username: "",
+            firstName: "",
+            lastName: "",
+            role: "",
         };
     }
 
@@ -48,16 +58,80 @@ function readInitialAuth(): AuthState {
         accessToken: getStoredAccessToken(),
         refreshToken: getStoredRefreshToken(),
         username: getStoredUsername(),
+        firstName: "",
+        lastName: "",
+        role: "",
+    };
+}
+
+interface UserMeResponse {
+    username?: string;
+    first_name?: string;
+    last_name?: string;
+    role?: string;
+}
+
+function applyUserProfile(
+    currentState: AuthState,
+    profile: UserMeResponse,
+) {
+    return {
+        ...currentState,
+        username: profile.username ?? currentState.username,
+        firstName: profile.first_name ?? "",
+        lastName: profile.last_name ?? "",
+        role: profile.role ?? "",
     };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [authState, setAuthState] = useState<AuthState>(readInitialAuth);
 
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadCurrentUser() {
+            if (!authState.accessToken || appEnv.enableMockAuth) {
+                return;
+            }
+
+            try {
+                const response = await apiClient.get<UserMeResponse>("users/me/");
+
+                if (!cancelled) {
+                    setAuthState((currentState) =>
+                        applyUserProfile(currentState, response.data),
+                    );
+                }
+            } catch {
+                if (!cancelled) {
+                    setStoredTokens({ accessToken: "", refreshToken: "" });
+                    setAuthState({
+                        accessToken: "",
+                        refreshToken: "",
+                        username: "",
+                        firstName: "",
+                        lastName: "",
+                        role: "",
+                    });
+                }
+            }
+        }
+
+        loadCurrentUser();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [authState.accessToken]);
+
     const value = useMemo<AuthContextValue>(
         () => ({
             isAuthenticated: Boolean(authState.accessToken),
             username: authState.username,
+            firstName: authState.firstName,
+            lastName: authState.lastName,
+            role: authState.role,
             async login(credentials) {
                 const username = credentials.username.trim();
                 const password = credentials.password;
@@ -67,6 +141,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         accessToken: "mock-jwt-access-token",
                         refreshToken: "mock-jwt-refresh-token",
                         username: username || "admin",
+                        firstName: "Demo",
+                        lastName: "User",
+                        role: "admin",
                     };
 
                     setStoredTokens(mockSession);
@@ -85,17 +162,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     accessToken: response.data?.access ?? "",
                     refreshToken: response.data?.refresh ?? "",
                     username,
+                    firstName: "",
+                    lastName: "",
+                    role: "",
                 };
 
                 if (!session.accessToken) {
                     throw new Error("JWT login response missing access token.");
                 }
 
-                setStoredTokens(session);
-                setStoredUsername(session.username);
-                setAuthState(session);
+                const profileResponse = await apiClient.get<UserMeResponse>("users/me/", {
+                    headers: {
+                        Authorization: `Bearer ${session.accessToken}`,
+                    },
+                });
 
-                return session;
+                const nextSession = applyUserProfile(session, profileResponse.data);
+                setStoredTokens(session);
+                setStoredUsername(nextSession.username);
+                setAuthState(nextSession);
+
+                return nextSession;
             },
             logout() {
                 setStoredTokens({ accessToken: "", refreshToken: "" });
@@ -104,6 +191,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     accessToken: "",
                     refreshToken: "",
                     username: "",
+                    firstName: "",
+                    lastName: "",
+                    role: "",
                 });
             },
         }),

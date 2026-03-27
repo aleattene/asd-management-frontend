@@ -1,13 +1,13 @@
 import { createCrudService } from "../../shared/api/createCrudService";
 import type { ResourceDefinition, SelectOption } from "../../shared/types/resources";
 
-const athletesService = createCrudService("/api/v1/athletes");
-const categoriesService = createCrudService("/api/v1/categories");
-const trainersService = createCrudService("/api/v1/trainers");
-const sportDoctorsService = createCrudService("/api/v1/doctors");
-const partnerCompaniesService = createCrudService("/api/v1/companies");
+const athletesService = createCrudService("athletes");
+const categoriesService = createCrudService("categories");
+const trainersService = createCrudService("trainers");
+const sportDoctorsService = createCrudService("doctors");
+const partnerCompaniesService = createCrudService("companies");
 const paymentsService = createCrudService("payments/payments");
-const sportCertificatesService = createCrudService("/api/v1/certificates");
+const sportCertificatesService = createCrudService("certificates");
 
 function toPersonOption(item: Record<string, unknown>): SelectOption {
     return {
