@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { getErrorMessage } from "../../shared/api/client";
 import { PageIntro } from "../../shared/ui/PageIntro";
 import { StatusPanel } from "../../shared/ui/StatusPanel";
-import { ResourceTable } from "../../shared/ui/ResourceTable";
+import { ResourceTable, type LookupMap } from "../../shared/ui/ResourceTable";
 import type { ResourceDefinition } from "../../shared/types/resources";
 
 type ResourceItem = Record<string, unknown> & { id: string | number };
@@ -14,6 +14,7 @@ interface ResourceListPageProps {
 
 export function ResourceListPage({ resource }: ResourceListPageProps) {
     const [items, setItems] = useState<ResourceItem[]>([]);
+    const [lookups, setLookups] = useState<LookupMap>({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -26,8 +27,30 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
 
             try {
                 const data = await resource.service.list();
+
+                const lookupSources = resource.columns
+                    .filter((col) => col.lookupSource)
+                    .map((col) => col.lookupSource as string);
+
+                const uniqueSources = [...new Set(lookupSources)];
+                const resolvedLookups: LookupMap = {};
+
+                await Promise.all(
+                    uniqueSources.map(async (source) => {
+                        const loader = resource.optionLoaders[source];
+                        if (!loader) return;
+                        const options = await loader();
+                        const map = new Map<string | number, string>();
+                        for (const opt of options) {
+                            map.set(opt.value, opt.label);
+                        }
+                        resolvedLookups[source] = map;
+                    }),
+                );
+
                 if (!cancelled) {
                     setItems(Array.isArray(data) ? (data as ResourceItem[]) : []);
+                    setLookups(resolvedLookups);
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -115,7 +138,7 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
             ) : null}
 
             {!isLoading && !error && items.length > 0 ? (
-                <ResourceTable resource={resource} items={items} onDelete={handleDelete} />
+                <ResourceTable resource={resource} items={items} onDelete={handleDelete} lookups={lookups} />
             ) : null}
         </section>
     );

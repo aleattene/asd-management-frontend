@@ -4,6 +4,7 @@ export interface ResourceColumnDefinition {
     key: string;
     label: string;
     type?: "date" | "currency";
+    lookupSource?: string;
 }
 
 export interface ResourceFieldDefinition {

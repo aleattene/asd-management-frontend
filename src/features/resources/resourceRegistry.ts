@@ -327,8 +327,8 @@ export const resourceRegistry: ResourceDefinition[] = [
         columns: [
             { key: "date", label: "Data", type: "date" },
             { key: "number", label: "Numero" },
-            { key: "direction", label: "Tipo" },
-            { key: "company", label: "Societa'" },
+            { key: "direction", label: "Tipo", lookupSource: "direction" },
+            { key: "company", label: "Societa'", lookupSource: "company" },
             { key: "amount", label: "Importo", type: "currency" },
             { key: "is_active", label: "Attiva" },
         ],
@@ -429,7 +429,7 @@ export const resourceRegistry: ResourceDefinition[] = [
         service: receiptsService,
         columns: [
             { key: "date", label: "Data", type: "date" },
-            { key: "user", label: "Utente" },
+            { key: "user", label: "Utente", lookupSource: "user" },
             { key: "description", label: "Descrizione" },
             { key: "amount", label: "Importo", type: "currency" },
             { key: "is_active", label: "Attiva" },
@@ -511,8 +511,8 @@ export const resourceRegistry: ResourceDefinition[] = [
         columns: [
             { key: "issue_date", label: "Emissione", type: "date" },
             { key: "expiration_date", label: "Scadenza", type: "date" },
-            { key: "athlete", label: "Atleta" },
-            { key: "doctor", label: "Medico sportivo" },
+            { key: "athlete", label: "Atleta", lookupSource: "athlete" },
+            { key: "doctor", label: "Medico sportivo", lookupSource: "doctor" },
             { key: "is_active", label: "Attivo" },
         ],
         fields: [
@@ -561,6 +561,79 @@ export const resourceRegistry: ResourceDefinition[] = [
                 const items = await athletesService.list();
                 return (items as Record<string, unknown>[]).map(toPersonOption);
             },
+            is_active: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
+        },
+    },
+    {
+        key: "enrollments",
+        path: "enrollments",
+        section: "Documentazione",
+        labels: {
+            singular: "iscrizione",
+            plural: "Iscrizioni",
+        },
+        description:
+            "Iscrizioni stagionali degli atleti con data, stagione e firma del tutore.",
+        service: enrollmentsService,
+        columns: [
+            { key: "athlete", label: "Atleta", lookupSource: "athlete" },
+            { key: "season", label: "Stagione" },
+            { key: "enrollment_date", label: "Data iscrizione", type: "date" },
+            { key: "is_active", label: "Attiva" },
+        ],
+        fields: [
+            {
+                name: "athlete",
+                label: "Atleta",
+                type: "select",
+                required: true,
+                placeholder: "Seleziona atleta",
+            },
+            {
+                name: "season",
+                label: "Stagione",
+                type: "text",
+                required: true,
+                maxLength: 9,
+                placeholder: "2025/2026",
+            },
+            {
+                name: "enrollment_date",
+                label: "Data iscrizione",
+                type: "date",
+                required: true,
+            },
+            {
+                name: "guardian_signed",
+                label: "Firma tutore",
+                type: "select",
+                required: false,
+                defaultValue: false,
+                valueType: "boolean",
+                placeholder: "Seleziona opzione",
+            },
+            {
+                name: "is_active",
+                label: "Iscrizione attiva",
+                type: "select",
+                required: true,
+                defaultValue: true,
+                valueType: "boolean",
+                placeholder: "Seleziona stato",
+            },
+        ],
+        optionLoaders: {
+            athlete: async () => {
+                const items = await athletesService.list();
+                return (items as Record<string, unknown>[]).map(toPersonOption);
+            },
+            guardian_signed: async () => [
+                { value: "true", label: "Si" },
+                { value: "false", label: "No" },
+            ],
             is_active: async () => [
                 { value: "true", label: "Si" },
                 { value: "false", label: "No" },
