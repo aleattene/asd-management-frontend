@@ -24,9 +24,14 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm run test:coverage
-      - name: Upload coverage to Codecov
+      - name: Run tests
+        if: matrix.node-version != '24.x'
+        run: npm test
+      - name: Run tests with coverage
         if: matrix.node-version == '24.x'
+        run: npm run test:coverage
+      - name: Upload coverage to Codecov
+        if: matrix.node-version == '24.x' && secrets.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

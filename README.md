@@ -1,7 +1,17 @@
 # ASD Management Frontend
 
+![React](https://img.shields.io/badge/Built%20with-React-61DAFB)
+![TypeScript](https://img.shields.io/badge/Built%20with-TypeScript-3178C6)
+![Vite](https://img.shields.io/badge/Built%20with-Vite-646CFF)
+[![CI](https://github.com/aleattene/asd-management-frontend/actions/workflows/test.yml/badge.svg)](https://github.com/aleattene/asd-management-frontend/actions/workflows/test.yml)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/8d5c1b60-cbc3-4e95-8602-30949fbc942d/deploy-status)](https://app.netlify.com/sites/asd-management/deploys)
-[![codecov](https://codecov.io/gh/aleattene/asd-management-frontend/branch/main/graph/badge.svg?token=TBZQE4DBR3)](https://codecov.io/gh/aleattene/asd-management-frontend)
+[![codecov](https://codecov.io/gh/aleattene/asd-management-frontend/graph/badge.svg?token=TBZQE4DBR3)](https://codecov.io/gh/aleattene/asd-management-frontend)
+[![GitHub commits](https://badgen.net/github/commits/aleattene/asd-management-frontend)](https://github.com/aleattene/asd-management-frontend/commits/)
+[![GitHub last commit](https://img.shields.io/github/last-commit/aleattene/asd-management-frontend)](https://github.com/aleattene/asd-management-frontend/commits/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/aleattene/asd-management-frontend/pulls)
+[![License](https://img.shields.io/github/license/aleattene/asd-management-frontend?color=blue)](https://github.com/aleattene/asd-management-frontend/blob/main/LICENSE)
+
+*Work in Progress*
 
 https://asd-management.netlify.app/
 

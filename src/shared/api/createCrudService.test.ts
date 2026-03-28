@@ -22,24 +22,24 @@ describe("createCrudService", () => {
     });
 
     describe("path normalization", () => {
-        it("appends trailing slash to resource path", () => {
+        it("appends trailing slash to resource path", async () => {
             const service = createCrudService("athletes");
             mockGet.mockResolvedValue({ data: [] });
-            service.list();
+            await service.list();
             expect(mockGet).toHaveBeenCalledWith("athletes/");
         });
 
-        it("normalizes path with leading slash", () => {
+        it("normalizes path with leading slash", async () => {
             const service = createCrudService("/athletes/");
             mockGet.mockResolvedValue({ data: [] });
-            service.list();
+            await service.list();
             expect(mockGet).toHaveBeenCalledWith("athletes/");
         });
 
-        it("normalizes path with extra slashes", () => {
+        it("normalizes path with extra slashes", async () => {
             const service = createCrudService("//athletes//");
             mockGet.mockResolvedValue({ data: [] });
-            service.list();
+            await service.list();
             expect(mockGet).toHaveBeenCalledWith("athletes/");
         });
     });
