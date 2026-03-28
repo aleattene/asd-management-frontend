@@ -4,7 +4,7 @@ import { getErrorMessage } from "../../shared/api/client";
 import { PageIntro } from "../../shared/ui/PageIntro";
 import { StatusPanel } from "../../shared/ui/StatusPanel";
 import { ResourceTable } from "../../shared/ui/ResourceTable";
-import type { ResourceDefinition } from "../../shared/types/resources";
+import type { LookupMap, ResourceDefinition } from "../../shared/types/resources";
 
 type ResourceItem = Record<string, unknown> & { id: string | number };
 
@@ -14,6 +14,7 @@ interface ResourceListPageProps {
 
 export function ResourceListPage({ resource }: ResourceListPageProps) {
     const [items, setItems] = useState<ResourceItem[]>([]);
+    const [lookups, setLookups] = useState<LookupMap>({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -23,11 +24,42 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
         async function loadItems() {
             setIsLoading(true);
             setError("");
+            setLookups({});
 
+            const uniqueSources = [
+                ...new Set(
+                    resource.columns
+                        .map((col) => col.lookupSource)
+                        .filter((source): source is string => typeof source === "string"),
+                ),
+            ];
+
+            // Each lookup promise fulfills (never rejects): errors are logged internally
+            const lookupPromises = uniqueSources.map(async (source) => {
+                const loader = resource.optionLoaders[source];
+                if (!loader) return null;
+                try {
+                    const options = await loader();
+                    const map = new Map<string | number, string>();
+                    for (const opt of options) {
+                        map.set(opt.value, opt.label);
+                    }
+                    return { source, map };
+                } catch (reason) {
+                    console.warn(`[${resource.key}] Lookup loader fallito per source "${source}":`, reason);
+                    return null;
+                }
+            });
+
+            // Fire list in parallel with the lookup loaders above
+            const listPromise = resource.service.list();
+
+            // Unblock UI as soon as the list resolves
             try {
-                const data = await resource.service.list();
+                const data = await listPromise;
                 if (!cancelled) {
                     setItems(Array.isArray(data) ? (data as ResourceItem[]) : []);
+                    setIsLoading(false);
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -37,11 +69,21 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
                             `Impossibile caricare ${resource.labels.plural.toLowerCase()}.`,
                         ),
                     );
-                }
-            } finally {
-                if (!cancelled) {
                     setIsLoading(false);
                 }
+                return;
+            }
+
+            // Collect lookups in the background (already running in parallel)
+            const results = await Promise.all(lookupPromises);
+            if (!cancelled) {
+                const resolvedLookups: LookupMap = {};
+                for (const result of results) {
+                    if (result) {
+                        resolvedLookups[result.source] = result.map;
+                    }
+                }
+                setLookups(resolvedLookups);
             }
         }
 
@@ -115,7 +157,7 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
             ) : null}
 
             {!isLoading && !error && items.length > 0 ? (
-                <ResourceTable resource={resource} items={items} onDelete={handleDelete} />
+                <ResourceTable resource={resource} items={items} onDelete={handleDelete} lookups={lookups} />
             ) : null}
         </section>
     );

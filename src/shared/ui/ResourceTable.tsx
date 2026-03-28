@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { ResourceColumnDefinition, ResourceDefinition } from "../types/resources";
+import type { LookupMap, ResourceColumnDefinition, ResourceDefinition } from "../types/resources";
 
 const euroCurrencyFormatter = new Intl.NumberFormat("it-IT", {
     style: "currency",
@@ -12,11 +12,25 @@ interface ResourceTableProps {
     resource: ResourceDefinition;
     items: ResourceItem[];
     onDelete: (item: ResourceItem) => void;
+    lookups?: LookupMap;
 }
 
-function formatCellValue(column: ResourceColumnDefinition, value: unknown) {
+function formatCellValue(column: ResourceColumnDefinition, value: unknown, lookups?: LookupMap) {
     if (value === null || value === undefined || value === "") {
         return "—";
+    }
+
+    if (column.lookupSource && lookups) {
+        const map = lookups[column.lookupSource];
+        if (map) {
+            const key =
+                typeof value === "object" && value !== null && "id" in value
+                    ? (value as Record<string, unknown>).id as string | number
+                    : (value as string | number);
+            if (map.has(key)) {
+                return map.get(key) as string;
+            }
+        }
     }
 
     if (
@@ -51,7 +65,7 @@ function formatCellValue(column: ResourceColumnDefinition, value: unknown) {
     return String(value);
 }
 
-export function ResourceTable({ resource, items, onDelete }: ResourceTableProps) {
+export function ResourceTable({ resource, items, onDelete, lookups }: ResourceTableProps) {
     return (
         <div className="overflow-hidden rounded-[1.5rem] border border-[color:var(--app-border)] bg-[color:var(--app-surface-strong)] shadow-[0_14px_40px_rgba(20,36,60,0.08)]">
             <div className="hidden overflow-x-auto lg:block">
@@ -74,7 +88,7 @@ export function ResourceTable({ resource, items, onDelete }: ResourceTableProps)
                             >
                                 {resource.columns.map((column) => (
                                     <td key={column.key} className="px-5 py-4 align-top">
-                                        {formatCellValue(column, item[column.key])}
+                                        {formatCellValue(column, item[column.key], lookups)}
                                     </td>
                                 ))}
                                 <td className="px-5 py-4">
@@ -114,7 +128,7 @@ export function ResourceTable({ resource, items, onDelete }: ResourceTableProps)
                                 >
                                     <span className="font-semibold text-slate-500">{column.label}</span>
                                     <span className="text-right text-slate-800">
-                                        {formatCellValue(column, item[column.key])}
+                                        {formatCellValue(column, item[column.key], lookups)}
                                     </span>
                                 </div>
                             ))}

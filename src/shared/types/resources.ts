@@ -4,6 +4,7 @@ export interface ResourceColumnDefinition {
     key: string;
     label: string;
     type?: "date" | "currency";
+    lookupSource?: string;
 }
 
 export interface ResourceFieldDefinition {
@@ -53,6 +54,8 @@ export interface ResourceDefinition {
     fields: ResourceFieldDefinition[];
     optionLoaders: Record<string, () => Promise<SelectOption[]>>;
 }
+
+export type LookupMap = Partial<Record<string, Map<string | number, string>>>;
 
 export type ModuleStatus = "live" | "planned" | "standby";
 
