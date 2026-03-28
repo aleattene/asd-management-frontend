@@ -25,32 +25,30 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
             setIsLoading(true);
             setError("");
 
+            const lookupSources = resource.columns
+                .filter((col) => col.lookupSource)
+                .map((col) => col.lookupSource as string);
+            const uniqueSources = [...new Set(lookupSources)];
+
+            // Fire list and all lookup loaders in parallel
+            const listPromise = resource.service.list();
+            const lookupPromises = uniqueSources.map(async (source) => {
+                const loader = resource.optionLoaders[source];
+                if (!loader) return null;
+                const options = await loader();
+                const map = new Map<string | number, string>();
+                for (const opt of options) {
+                    map.set(opt.value, opt.label);
+                }
+                return { source, map };
+            });
+
+            // Unblock UI as soon as the list resolves
             try {
-                const data = await resource.service.list();
-
-                const lookupSources = resource.columns
-                    .filter((col) => col.lookupSource)
-                    .map((col) => col.lookupSource as string);
-
-                const uniqueSources = [...new Set(lookupSources)];
-                const resolvedLookups: LookupMap = {};
-
-                await Promise.allSettled(
-                    uniqueSources.map(async (source) => {
-                        const loader = resource.optionLoaders[source];
-                        if (!loader) return;
-                        const options = await loader();
-                        const map = new Map<string | number, string>();
-                        for (const opt of options) {
-                            map.set(opt.value, opt.label);
-                        }
-                        resolvedLookups[source] = map;
-                    }),
-                );
-
+                const data = await listPromise;
                 if (!cancelled) {
                     setItems(Array.isArray(data) ? (data as ResourceItem[]) : []);
-                    setLookups(resolvedLookups);
+                    setIsLoading(false);
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -60,11 +58,23 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
                             `Impossibile caricare ${resource.labels.plural.toLowerCase()}.`,
                         ),
                     );
-                }
-            } finally {
-                if (!cancelled) {
                     setIsLoading(false);
                 }
+                return;
+            }
+
+            // Settle lookups in the background (already running in parallel)
+            const results = await Promise.allSettled(lookupPromises);
+            if (!cancelled) {
+                const resolvedLookups: LookupMap = {};
+                for (const result of results) {
+                    if (result.status === "fulfilled" && result.value) {
+                        resolvedLookups[result.value.source] = result.value.map;
+                    } else if (result.status === "rejected") {
+                        console.warn("Lookup loader fallito:", result.reason);
+                    }
+                }
+                setLookups(resolvedLookups);
             }
         }
 

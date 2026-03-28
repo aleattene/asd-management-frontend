@@ -25,9 +25,9 @@ function formatCellValue(column: ResourceColumnDefinition, value: unknown, looku
     if (column.lookupSource && lookups) {
         const map = lookups[column.lookupSource];
         if (map) {
-            const label = map.get(value as string | number);
-            if (label) {
-                return label;
+            const key = value as string | number;
+            if (map.has(key)) {
+                return map.get(key) as string;
             }
         }
     }
