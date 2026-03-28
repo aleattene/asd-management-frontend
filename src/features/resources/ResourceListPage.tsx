@@ -46,7 +46,7 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
                     }
                     return { source, map };
                 } catch (reason) {
-                    console.warn("Lookup loader fallito:", reason);
+                    console.warn(`[${resource.key}] Lookup loader fallito per source "${source}":`, reason);
                     return null;
                 }
             });
