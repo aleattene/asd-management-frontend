@@ -24,24 +24,32 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
         async function loadItems() {
             setIsLoading(true);
             setError("");
+            setLookups({});
 
             const lookupSources = resource.columns
                 .filter((col) => col.lookupSource)
                 .map((col) => col.lookupSource as string);
             const uniqueSources = [...new Set(lookupSources)];
 
-            // Fire list and all lookup loaders in parallel
-            const listPromise = resource.service.list();
+            // Each lookup promise fulfills (never rejects): errors are logged internally
             const lookupPromises = uniqueSources.map(async (source) => {
                 const loader = resource.optionLoaders[source];
                 if (!loader) return null;
-                const options = await loader();
-                const map = new Map<string | number, string>();
-                for (const opt of options) {
-                    map.set(opt.value, opt.label);
+                try {
+                    const options = await loader();
+                    const map = new Map<string | number, string>();
+                    for (const opt of options) {
+                        map.set(opt.value, opt.label);
+                    }
+                    return { source, map };
+                } catch (reason) {
+                    console.warn("Lookup loader fallito:", reason);
+                    return null;
                 }
-                return { source, map };
             });
+
+            // Fire list in parallel with the lookup loaders above
+            const listPromise = resource.service.list();
 
             // Unblock UI as soon as the list resolves
             try {
@@ -63,15 +71,13 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
                 return;
             }
 
-            // Settle lookups in the background (already running in parallel)
-            const results = await Promise.allSettled(lookupPromises);
+            // Collect lookups in the background (already running in parallel)
+            const results = await Promise.all(lookupPromises);
             if (!cancelled) {
                 const resolvedLookups: LookupMap = {};
                 for (const result of results) {
-                    if (result.status === "fulfilled" && result.value) {
-                        resolvedLookups[result.value.source] = result.value.map;
-                    } else if (result.status === "rejected") {
-                        console.warn("Lookup loader fallito:", result.reason);
+                    if (result) {
+                        resolvedLookups[result.source] = result.map;
                     }
                 }
                 setLookups(resolvedLookups);
