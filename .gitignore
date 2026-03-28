@@ -125,6 +125,13 @@ dist
 # vite
 .vite
 
-# local
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Internal notes — never commit
 TODO.md
+
+# Internal documentation — not for public repositories
+docs/
 
