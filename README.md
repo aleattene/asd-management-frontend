@@ -11,10 +11,6 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/aleattene/asd-management-frontend/pulls)
 [![License](https://img.shields.io/github/license/aleattene/asd-management-frontend?color=blue)](https://github.com/aleattene/asd-management-frontend/blob/main/LICENSE)
 
-*Work in Progress*
-
-https://asd-management.netlify.app/
-
 ## Moduli implementati
 
 - Atleti
