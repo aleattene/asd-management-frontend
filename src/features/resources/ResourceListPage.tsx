@@ -35,7 +35,7 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
                 const uniqueSources = [...new Set(lookupSources)];
                 const resolvedLookups: LookupMap = {};
 
-                await Promise.all(
+                await Promise.allSettled(
                     uniqueSources.map(async (source) => {
                         const loader = resource.optionLoaders[source];
                         if (!loader) return;

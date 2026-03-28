@@ -6,7 +6,7 @@ const euroCurrencyFormatter = new Intl.NumberFormat("it-IT", {
     currency: "EUR",
 });
 
-export type LookupMap = Record<string, Map<string | number, string>>;
+export type LookupMap = Partial<Record<string, Map<string | number, string>>>;
 
 type ResourceItem = Record<string, unknown> & { id: string | number };
 
