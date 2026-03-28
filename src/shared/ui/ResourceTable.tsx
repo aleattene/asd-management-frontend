@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
-import type { ResourceColumnDefinition, ResourceDefinition } from "../types/resources";
+import type { LookupMap, ResourceColumnDefinition, ResourceDefinition } from "../types/resources";
 
 const euroCurrencyFormatter = new Intl.NumberFormat("it-IT", {
     style: "currency",
     currency: "EUR",
 });
-
-export type LookupMap = Partial<Record<string, Map<string | number, string>>>;
 
 type ResourceItem = Record<string, unknown> & { id: string | number };
 
@@ -25,7 +23,10 @@ function formatCellValue(column: ResourceColumnDefinition, value: unknown, looku
     if (column.lookupSource && lookups) {
         const map = lookups[column.lookupSource];
         if (map) {
-            const key = value as string | number;
+            const key =
+                typeof value === "object" && value !== null && "id" in value
+                    ? (value as Record<string, unknown>).id as string | number
+                    : (value as string | number);
             if (map.has(key)) {
                 return map.get(key) as string;
             }

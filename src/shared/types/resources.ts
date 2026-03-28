@@ -55,6 +55,8 @@ export interface ResourceDefinition {
     optionLoaders: Record<string, () => Promise<SelectOption[]>>;
 }
 
+export type LookupMap = Partial<Record<string, Map<string | number, string>>>;
+
 export type ModuleStatus = "live" | "planned" | "standby";
 
 export interface ModuleDefinition {

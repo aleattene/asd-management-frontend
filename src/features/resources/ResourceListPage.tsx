@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { getErrorMessage } from "../../shared/api/client";
 import { PageIntro } from "../../shared/ui/PageIntro";
 import { StatusPanel } from "../../shared/ui/StatusPanel";
-import { ResourceTable, type LookupMap } from "../../shared/ui/ResourceTable";
-import type { ResourceDefinition } from "../../shared/types/resources";
+import { ResourceTable } from "../../shared/ui/ResourceTable";
+import type { LookupMap, ResourceDefinition } from "../../shared/types/resources";
 
 type ResourceItem = Record<string, unknown> & { id: string | number };
 
@@ -26,10 +26,13 @@ export function ResourceListPage({ resource }: ResourceListPageProps) {
             setError("");
             setLookups({});
 
-            const lookupSources = resource.columns
-                .filter((col) => col.lookupSource)
-                .map((col) => col.lookupSource as string);
-            const uniqueSources = [...new Set(lookupSources)];
+            const uniqueSources = [
+                ...new Set(
+                    resource.columns
+                        .map((col) => col.lookupSource)
+                        .filter((source): source is string => typeof source === "string"),
+                ),
+            ];
 
             // Each lookup promise fulfills (never rejects): errors are logged internally
             const lookupPromises = uniqueSources.map(async (source) => {
